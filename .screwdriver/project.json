@@ -1,0 +1,51 @@
+  {
+  "modules": [
+    {
+      "repository": "https://github.com/substance/application.git",
+      "folder": "node_modules/substance-application",
+      "branch": "lens"
+    },
+    {
+      "repository": "https://github.com/substance/data.git",
+      "folder": "node_modules/substance-data",
+      "branch": "lens"
+    },
+    {
+      "repository": "https://github.com/substance/util.git",
+      "folder": "node_modules/substance-util",
+      "branch": "lens"
+    },
+    {
+      "repository": "https://github.com/substance/cjs.git",
+      "folder": "node_modules/substance-cjs",
+      "branch": "master"
+    }
+  ],
+  "node_modules": {
+    "underscore": "1.5.x",
+    "express": "3.3.x"
+  },
+  "npm": {
+    "engines": {
+      "node": ">=0.8.x",
+      "npm": ">=1.1.x"
+    }
+  },
+  "styles": {
+  },
+  "assets": {
+    "lib/jquery-2.0.3.min.js": "lib/jquery-2.0.3.min.js",
+    "lib/jquery-2.0.3.min.map": "lib/jquery-2.0.3.min.map"
+  },
+  "bundle": {
+    "name": "lens_browser",
+    "folder": "./dist",
+    "source": "./boot.js",
+    "index": "./index.html",
+    "ignores": [
+      "substance-operator",
+      "substance-chronicle",
+      "substance-commander"
+    ]
+  }
+}
