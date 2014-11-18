@@ -1,3 +1,219 @@
+/* Reset
+---------------------------------
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-weight: inherit;
+  font-style: inherit;
+  font-size: 100%;
+  font-family: inherit;
+  vertical-align: baseline;
+}
+:focus {
+  outline: 0;
+}
 body {
-  background: #ccc;
+  line-height: 1;
+  color: black;
+  background: white;
+}
+/*ol, ul {
+  list-style: none;
+}*/
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+caption, th, td {
+  text-align: left;
+  font-weight: normal;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: "";
+}
+blockquote, q {
+  quotes: "" "";
+}
+
+/* Use borderbox model */
+* {
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  text-decoration: none;
+}
+
+
+/* Fonts and colors
+---------------------------------
+*/
+
+body {
+  overflow: hidden;
+  position: fixed;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+
+  font-family: 'Source Sans Pro', Helvetica, Arial, Verdana, sans-serif;
+  color: #505050;  
+}
+
+a {
+  color: #1B6685;
+  font-weight: normal;
+  text-decoration: none;
+  -moz-transition: background-color 100ms linear, color 100ms linear, opacity 100ms linear;
+  -o-transition: background-color 100ms linear, color 100ms linear, opacity 100ms linear;
+  -webkit-transition: background-color 100ms linear, color 100ms linear, opacity 100ms linear;
+  transition: background-color 100ms linear, color 100ms linear, opacity 100ms linear;
+}
+
+a:hover {
+  color: rgba(11, 157, 217, 1);
+}
+
+/* Layout stuff 
+---------------------------------
+*/
+
+#searchbar {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+
+  background: #eee;
+  border-bottom: 1px solid #ddd;
+  height: 60px;
+  overflow: hidden;
+}
+
+#results {
+  position: fixed;
+  top: 60px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  overflow: hidden;
+}
+
+/* Documents result list */
+
+#documents {
+  float: left;
+  width: 60%;
+  height: 100%;
+  border-right: 1px solid #ddd;
+}
+
+#panels {
+  float: right;
+  width: 40%;
+  height: 100%;
+}
+
+
+/* Search bar
+---------------------------------
+*/
+
+#searchbar .search-field {
+  display: block;
+  float: left;
+  border: none;
+  margin-left: 20px;
+  margin-top: 15px;
+  height: 30px;
+  width: 300px;
+  padding: 0 10px;
+  font-size: 18px;
+}
+
+#searchbar .search-button {
+  margin-top: 15px;
+  display: block;
+  float: left;
+  background: #444;
+  height: 30px;
+  line-height: 30px;
+  padding: 0px 20px;
+  color: #fff;
+}
+
+#searchbar .search-button:hover {
+  background: #000;
+}
+
+/* Documents result list
+---------------------------------
+*/
+
+#documents .document {
+  padding: 20px;
+  position: relative;
+  border-bottom: 1px solid #ddd;
+}
+
+#documents .document .title {
+  display: block;
+  padding-right: 100px;
+  font-size: 20px;
+  padding-bottom: 10px;
+}
+
+#documents .document .intro {
+  padding-top: 10px;
+  font-style: italic;
+  color: rgba(0,0,0,0.6);
+}
+
+#documents .document .toggle-preview {
+  display: block;
+  color: rgba(11, 157, 217, 1);
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+
+/* Filters
+---------------------------------
+*/
+
+
+
+#filters .filter {
+  padding: 20px;
+}
+
+#filters .filter .filter-name {
+  text-transform: uppercase;
+  font-size: 12px;
+  color: #666;
+  padding-bottom: 10px;
+}
+
+#filters .filter .filter-values {
+  overflow: hidden;
+}
+
+#filters .filter .filter-values .value {
+  float: left;
+  margin-right: 20px;
+  background: #eee;
+  padding: 2px 5px;
 }

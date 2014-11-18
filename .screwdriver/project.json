@@ -1,9 +1,9 @@
-  {
+{
   "modules": [
     {
       "repository": "https://github.com/substance/application.git",
       "folder": "node_modules/substance-application",
-      "branch": "lens"
+      "branch": "master"
     },
     {
       "repository": "https://github.com/substance/data.git",
@@ -32,6 +32,7 @@
     }
   },
   "styles": {
+    "styles/lens_browser.css":  "styles/lens_browser.css"
   },
   "assets": {
     "lib/jquery-2.0.3.min.js": "lib/jquery-2.0.3.min.js",

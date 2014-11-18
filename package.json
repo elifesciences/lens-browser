@@ -1,0 +1,16 @@
+{
+  "name": "lens-browser",
+  "description": "Lens browser bundle.",
+  "dependencies": {
+    "underscore": "1.5.x",
+    "express": "3.3.x",
+    "ejs": "*",
+    "substance-application": "git+https://github.com/substance/application.git#lens",
+    "substance-data": "git+https://github.com/substance/data.git#lens",
+    "substance-util": "git+https://github.com/substance/util.git#lens"
+  },
+  "devDependencies": {
+    "substance-cjs": "git+https://github.com/substance/cjs.git#master"
+  },
+  "version": "1.0.0"
+}

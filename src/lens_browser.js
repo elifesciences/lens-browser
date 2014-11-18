@@ -1,61 +1,35 @@
 "use strict";
 
+var _ = require("underscore");
 var Application = require("substance-application");
 var BrowserController = require("./browser_controller");
+var DefaultRouter = require("substance-application").DefaultRouter;
 
-
-// The Lens Browser Application
-// ========
-//
-
-var Browser = function(config) {
-  config = config || {};
-  config.routes = config.routes || this.getRoutes();
-
-  // Note: call this after configuration, e.g., routes must be configured before
-  //   as they are used to setup a router
-  Application.call(this, config);
-
-  this.controller = config.controller || this.createController(config);
+var LensBrowserApplication = function() {
+  Application.call(this);
+  this.controller = new BrowserController(this);
+  var router = new DefaultRouter(this);
+  this.setRouter(router);
 };
 
-Browser.Prototype = function() {
+LensBrowserApplication.Prototype = function() {
+  var __super__ = Application.prototype;
 
-  // Start listening to routes
-  // --------
+  this.start = function(options) {
+    __super__.start.call(this, options);
 
-  this.render = function() {
-    this.view = this.controller.createView();
-    this.$el.html(this.view.render().el);
-  };
 
-  this.getRoutes = function() {
-    return Browser.getDefaultRoutes();
-  };
+    // Inject main view
+    this.el.appendChild(this.controller.view.el);
 
-  this.createController = function(config) {
-    return new BrowserController(config);
+    if (!window.location.hash) {
+      this.switchState([{ id: "main" }], { updateRoute: true, replace: true });
+    }
+
   };
 };
 
+LensBrowserApplication.Prototype.prototype = Application.prototype;
+LensBrowserApplication.prototype = new LensBrowserApplication.Prototype();
 
-Browser.Prototype.prototype = Application.prototype;
-Browser.prototype = new Browser.Prototype();
-Browser.prototype.constructor = Browser;
-
-Browser.DEFAULT_ROUTES = [
-  {
-    "route": "",
-    "name": "browser",
-    "command": "openBrowser"
-  }
-];
-
-Browser.getDefaultRoutes = function() {
-  return Browser.DEFAULT_ROUTES;
-};
-
-Browser.Controller = BrowserController;
-Browser.BrowserController = BrowserController;
-
-module.exports = Browser;
+module.exports = LensBrowserApplication;
