@@ -189,31 +189,33 @@ a:hover {
   right: 20px;
 }
 
-
-/* Filters
+/* Facets panel
 ---------------------------------
 */
 
-
-
-#filters .filter {
+#facets .facet {
   padding: 20px;
 }
 
-#filters .filter .filter-name {
+#facets .facet .facet-name {
   text-transform: uppercase;
   font-size: 12px;
   color: #666;
   padding-bottom: 10px;
 }
 
-#filters .filter .filter-values {
+#facets .facet .facet-values {
   overflow: hidden;
 }
 
-#filters .filter .filter-values .value {
+#facets .facet .facet-values .value {
   float: left;
   margin-right: 20px;
   background: #eee;
   padding: 2px 5px;
+}
+
+#facets .facet .facet-values .value.selected {
+  background: #444;
+  color: white;
 }

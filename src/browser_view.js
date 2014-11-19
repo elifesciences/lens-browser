@@ -33,29 +33,32 @@ var BrowserView = function(controller) {
 
   // List of found documents
   // ------------
+  // 
+  // Left floated 60%
 
-  // Left floated 50%
   this.documentsEl = $$('#documents');
   this.resultsEl.appendChild(this.documentsEl);
 
   // Panel Wrapper
   // ------------
   //
-  // Right floated 50%
+  // Right floated 40%
 
   this.panelsEl = $$('#panels');
   this.resultsEl.appendChild(this.panelsEl);
 
-  this.filtersEl = $$('#filters');
-  this.panelsEl.appendChild(this.filtersEl);
+  this.facetsEl = $$('#facets');
+  this.panelsEl.appendChild(this.facetsEl);
 
   this.previewEl = $$('#previewEl');
   this.panelsEl.appendChild(this.previewEl);
 
 
-  // Events
+  // Event handlers
+  // ------------
 
   $(this.searchButton).click(_.bind(this.startSearch, this));
+  this.$el.on('click', '.value', _.bind(this.toggleFilter, this));
 };
 
 BrowserView.Prototype = function() {
@@ -65,6 +68,7 @@ BrowserView.Prototype = function() {
   //
 
   this.startSearch = function(e) {
+    e.preventDefault();
     var searchstr = $(this.searchFieldEl).val();
     if (searchstr) {
       this.controller.switchState({
@@ -72,12 +76,40 @@ BrowserView.Prototype = function() {
         searchstr: searchstr
       });
     }
-    e.preventDefault();
   };
 
+  this.toggleFilter = function(e) {
+    e.preventDefault();
 
-  this.renderSearchResult = function() {
-    console.log('render searchresult');
+    var facetName = e.currentTarget.dataset.facet;
+    var value = e.currentTarget.dataset.value;
+
+    // TODO: this preparing of new filter state is quite hacky.
+    // We need to find a better way
+
+    var filters = this.controller.searchResult.filters;
+
+    // Implicitly remove a filter if already set
+    if ($(e.currentTarget).hasClass('selected')) {
+      filters[facetName] = _.without(filters[facetName], value);
+      
+      if (filters[facetName].length === 0) {
+        delete filters[facetName];
+      }
+    } else {
+      // Add new filter
+      if (!filters[facetName]) {
+        filters[facetName] = [];
+      }
+      filters[facetName].push(value);
+    }
+
+    // Update state
+    this.controller.switchState({
+      id: "main",
+      searchstr: this.controller.state.searchstr,
+      filters: JSON.stringify(filters)
+    });
   };
 
   // Rendering
@@ -86,14 +118,16 @@ BrowserView.Prototype = function() {
 
   // After state transition
   this.afterTransition = function(oldState, newState) {
+    console.log('after transition');
     if (newState.id === "main") {
       if (newState.searchstr) {
+        // console.log('MEH', newState.searchstr);
         this.renderSearchResult();
         // if the search has not changed then 'likely' the filter has
         // TODO: could be detected more explicitly
         if (oldState.searchstr === newState.searchstr) {
           console.log('filters have been changed...');
-          this.updateFilters();
+          this.renderSearchResult();
         }
       } else {
         // TODO: render 'moderated' list of documents
@@ -103,7 +137,10 @@ BrowserView.Prototype = function() {
 
   // Display initial search result
   this.renderSearchResult = function() {
-    var documents = this.controller.searchResult.documents;
+    this.documentsEl.innerHTML = "";
+
+    // Get filtered documents
+    var documents = this.controller.searchResult.getDocuments();
 
     _.each(documents, function(doc) {
       var documentEl = $$('.document', {children: [
@@ -116,82 +153,37 @@ BrowserView.Prototype = function() {
       this.documentsEl.appendChild(documentEl);
     }, this);
 
-    this.renderFilters();
+    this.renderFacets();
   };
 
-  this.renderFilters = function() {
+  this.renderFacets = function() {
+    this.facetsEl.innerHTML = "";
 
+    var facets = this.controller.searchResult.getAvailableFacets();
 
-    // TODO: extract facets from list of documents and set filters
-    var filters = [
-      {
-        "name": "Article Type",
-        "values": [
-          {
-            "name": "Research Article",
-            "frequency": 6
-          },
-          {
-            "name": "Editorial",
-            "frequency": 6
-          }
-        ]
-      },
-      {
-        "name": "Subject",
-        "values": [
-          {
-            "name": "Neuroscience",
-            "frequency": 3
-          },
-          {
-            "name": "Cell biology",
-            "frequency": 2
-          }
-        ]
-      },
-      {
-        "name": "Auhors",
-        "values": [
-          {
-            "name": "Keigo Araki",
-            "frequency": 1
-          },
-          {
-            "name": "Mie Yamamoto",
-            "frequency": 2
-          }
-        ]
-      }
-    ];
-
-    // Render filter categories
-
-
-
-    _.each(filters, function(filter) {
-      var filterEl = $$('.filter');
+    // Render facets
+    _.each(facets, function(facet) {
+      var facetEl = $$('.facet');
 
       // Filter name
-      filterEl.appendChild($$('.filter-name', { text: filter.name }));
-      var filterValuesEl = $$('.filter-values');
+      facetEl.appendChild($$('.facet-name', { text: facet.name }));
+      var facetValuesEl = $$('.facet-values');
 
-      _.each(filter.values, function(filterValue) {
-        filterValuesEl.appendChild($$('a.value', {href: "#", text: filterValue.name + " ("+filterValue.frequency+")"}));
+      // Filter values + frequency in doc corpus
+      _.each(facet.values, function(facetValue) {
+        facetValuesEl.appendChild($$('a.value'+(facetValue.selected ? '.selected' : ''), {
+          href: "#",
+          "data-facet": facet.property,
+          "data-value": facetValue.name,
+          text: facetValue.name + " ("+facetValue.frequency+")"
+        }));
       }, this);
 
-      filterEl.appendChild(filterValuesEl);
-
-      this.filtersEl.appendChild(filterEl);
-
+      facetEl.appendChild(facetValuesEl);
+      this.facetsEl.appendChild(facetEl);
     }, this);
-
   };
 
-  // Update documents listing according to changed filters
-  this.updateFilters = function() {
-
-  };
 
   this.displayPreview = function() {
     // Hide facets panel and instead show article preview according to state

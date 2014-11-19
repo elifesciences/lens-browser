@@ -4,7 +4,13 @@ var _ = require("underscore");
 var util = require("substance-util");
 var Controller = require("substance-application").Controller;
 var BrowserView = require("./browser_view");
+var SearchResult = require("./search_result");
+
 var exampleSearchResult = require("../data/searchresult");
+
+
+// BrowserController
+// =============================
 
 var BrowserController = function(app) {
   Controller.call(this, app);
@@ -22,7 +28,7 @@ BrowserController.Prototype = function() {
     id: "main"
   };
 
-   this.createView = function() {
+  this.createView = function() {
     if (!this.view) {
       this.view = new BrowserView(this);
     }
@@ -40,16 +46,37 @@ BrowserController.Prototype = function() {
     // }
 
     if (newState.id === "main" && newState.searchstr && newState.searchstr !== this.state.searchstr) {
-      this.loadSearchResult(newState.searchstr, cb);
+      this.loadSearchResult(newState, cb);
+    } else if (newState.id === "main" && newState.searchstr === this.state.searchstr && newState.filters !== this.state.filters) {
+      this.filterDocuments(newState, cb);
+    } else {
+      console.log('state not explicitly handled', this.state, newState);
+      cb(null);  
     }
+    
+  };
 
+  this.encodeFilters = function() {
+
+  };
+
+  // Get filters from new state
+  this.getFilters = function(newState) {
+    if (!newState.filters) return {};
+    return JSON.parse(newState.filters);
+  };
+
+  this.filterDocuments = function(newState, cb) {
+    var filters = this.getFilters(newState);
+    this.searchResult.applyFilters(filters);
     cb(null);
   };
 
-  this.loadSearchResult = function(searchStr, cb) {
-    
-    this.searchResult = exampleSearchResult;
-    console.log('loading search result', exampleSearchResult);
+  this.loadSearchResult = function(newState, cb) {
+    // Get filters from app state
+    var filters = this.getFilters(newState);
+
+    this.searchResult = new SearchResult(exampleSearchResult, filters);
     cb(null);
   };
 
