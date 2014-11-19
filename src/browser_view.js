@@ -53,6 +53,7 @@ var BrowserView = function(controller) {
   this.previewEl = $$('#previewEl');
   this.panelsEl.appendChild(this.previewEl);
 
+  this.elementIndex = {};
 
   // Event handlers
   // ------------
@@ -139,14 +140,27 @@ BrowserView.Prototype = function() {
   this.renderSearchResult = function() {
     this.documentsEl.innerHTML = "";
 
+    // Reset element index
+    this.elementIndex = {};
+
     // Get filtered documents
     var documents = this.controller.searchResult.getDocuments();
 
     _.each(documents, function(doc) {
+      var authors = [];
+
+      _.each(doc.authors, function(author) {
+        var authorEl = $$('span.author.facet-occurence', {text: author});
+        this.elementIndex["authors/"+author] = authorEl;
+        authors.push(authorEl);
+      }, this);
+
       var documentEl = $$('.document', {children: [
         $$('a.toggle-preview', {href: '#', html: '<i class="fa fa-eye"></i> Preview'}),
         $$('a.title', {href: '#', text: doc.title}),
-        $$('.authors', {text: doc.authors.join(', ')}),
+        $$('.authors', {
+          children: authors
+        }),
         $$('.intro', {text: doc.intro}),
         $$('.published-on', {text: doc.published_on})
       ]});
@@ -182,6 +196,21 @@ BrowserView.Prototype = function() {
       facetEl.appendChild(facetValuesEl);
       this.facetsEl.appendChild(facetEl);
     }, this);
+
+    this.highlightFacets();
+  };
+
+  // Highlight currently filtered facets
+  this.highlightFacets = function() {
+    $('.facet-occurence.selected').removeClass('highighted');
+
+    var filters = this.controller.searchResult.filters;
+    _.each(filters, function(facetValues, facetName) {      
+      _.each(facetValues, function(val) {
+        var el = this.elementIndex[facetName+"/"+val];
+        if (el) $(el).addClass('highlighted');
+      }, this);
+    }, this);
   };
 
 
@@ -191,10 +220,8 @@ BrowserView.Prototype = function() {
 
   this.render = function() {
     this.el.innerHTML = "";
-
     this.el.appendChild(this.searchbarEl);
     this.el.appendChild(this.resultsEl);
-
     return this;
   };
 

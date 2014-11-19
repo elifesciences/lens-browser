@@ -175,6 +175,15 @@ a:hover {
   padding-bottom: 10px;
 }
 
+#documents .document .authors .author {
+  margin-right: 10px;
+}
+
+#documents .document .authors .author.highlighted {
+  background: #444;
+  color: white;
+}
+
 #documents .document .intro {
   padding-top: 10px;
   font-style: italic;
