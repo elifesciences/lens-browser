@@ -13,7 +13,49 @@ var BrowserView = function(controller) {
 
   this.controller = controller;
   this.$el.attr({id: "container"});
-  this.$el.click('.search-button', _.bind(this.startSearch, this));
+
+  // Elements
+  // --------
+
+  // Search bar
+  // ------------
+
+  this.searchbarEl = $$('#searchbar', {html: ''});
+  this.searchFieldEl = $$('input.search-field', {type: "text"});
+  this.searchbarEl.appendChild(this.searchFieldEl);
+  this.searchButton = $$('a.search-button' , {href: "#", text: 'Search'});
+  this.searchbarEl.appendChild(this.searchButton);
+
+  // Results
+  // ------------
+
+  this.resultsEl = $$('#results');
+
+  // List of found documents
+  // ------------
+
+  // Left floated 50%
+  this.documentsEl = $$('#documents');
+  this.resultsEl.appendChild(this.documentsEl);
+
+  // Panel Wrapper
+  // ------------
+  //
+  // Right floated 50%
+
+  this.panelsEl = $$('#panels');
+  this.resultsEl.appendChild(this.panelsEl);
+
+  this.filtersEl = $$('#filters');
+  this.panelsEl.appendChild(this.filtersEl);
+
+  this.previewEl = $$('#previewEl');
+  this.panelsEl.appendChild(this.previewEl);
+
+
+  // Events
+
+  $(this.searchButton).click('a.search-button', _.bind(this.startSearch, this));
 };
 
 BrowserView.Prototype = function() {
@@ -24,10 +66,13 @@ BrowserView.Prototype = function() {
 
   this.startSearch = function(e) {
     // TODO: read content from search input field
-    this.controller.switchState({
-      id: "main",
-      searchstr: "retinoblastoma"
-    });
+    var searchstr = $(this.searchFieldEl).val();
+    if (searchstr) {
+      this.controller.switchState({
+        id: "main",
+        searchstr: searchstr
+      });
+    }
     e.preventDefault();
   };
 
@@ -42,13 +87,18 @@ BrowserView.Prototype = function() {
 
   // After state transition
   this.afterTransition = function(oldState, newState) {
-    if (oldState.id === "initialized") {
-      this.renderSearchResult(); // later render promoted results
-    }
-
-    if (oldState === "main" && newState === "main") {
-      console.log('filters have been changed...');
-      this.updateFilters();
+    if (newState.id === "main") {
+      if (newState.searchstr) {
+        this.renderSearchResult();
+        // if the search has not changed then 'likely' the filter has
+        // TODO: could be detected more explicitly
+        if (oldState.searchstr === newState.searchstr) {
+          console.log('filters have been changed...');
+          this.updateFilters();
+        }
+      } else {
+        // TODO: render 'moderated' list of documents
+      }
     }
   };
 
@@ -72,7 +122,7 @@ BrowserView.Prototype = function() {
 
   this.renderFilters = function() {
 
-    
+
     // TODO: extract facets from list of documents and set filters
     var filters = [
       {
@@ -117,7 +167,7 @@ BrowserView.Prototype = function() {
     ];
 
     // Render filter categories
-    
+
 
 
     _.each(filters, function(filter) {
@@ -151,44 +201,8 @@ BrowserView.Prototype = function() {
   this.render = function() {
     this.el.innerHTML = "";
 
-    // Search bar
-    // ------------
-
-    this.searchbarEl = $$('#searchbar', {html: ''});
-
-    this.searchFieldEl = $$('input.search-field', {type: "text"});
-    this.searchbarEl.appendChild(this.searchFieldEl);
-    this.searchButton = $$('a.search-button' , {href: "#", text: 'Search'});
-    this.searchbarEl.appendChild(this.searchButton);
-
     this.el.appendChild(this.searchbarEl);
-
-    // Results
-    // ------------
-
-    this.resultsEl = $$('#results');
     this.el.appendChild(this.resultsEl);
-
-    // List of found documents
-    // ------------
-
-    // Left floated 50%
-    this.documentsEl = $$('#documents');
-    this.resultsEl.appendChild(this.documentsEl);
-
-    // Panel Wrapper
-    // ------------
-    // 
-    // Right floated 50%
-
-    this.panelsEl = $$('#panels');
-    this.resultsEl.appendChild(this.panelsEl);
-
-    this.filtersEl = $$('#filters');
-    this.panelsEl.appendChild(this.filtersEl);
-
-    this.previewEl = $$('#previewEl');
-    this.panelsEl.appendChild(this.previewEl);
 
     return this;
   };
