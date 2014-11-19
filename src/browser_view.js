@@ -55,7 +55,7 @@ var BrowserView = function(controller) {
 
   // Events
 
-  $(this.searchButton).click('a.search-button', _.bind(this.startSearch, this));
+  $(this.searchButton).click(_.bind(this.startSearch, this));
 };
 
 BrowserView.Prototype = function() {
@@ -65,7 +65,6 @@ BrowserView.Prototype = function() {
   //
 
   this.startSearch = function(e) {
-    // TODO: read content from search input field
     var searchstr = $(this.searchFieldEl).val();
     if (searchstr) {
       this.controller.switchState({
