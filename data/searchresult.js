@@ -8,7 +8,7 @@ var searchResult = {
       "published_on": "2014-11-10",
       "updated_at": "2014-11-18",
       "article_type": "Research Article",
-      "subject": "Cell biology"
+      "subjects": ["Cell biology", "Plant biology"]
     },
     {
       "title": "Irreversible fate commitment in the Arabidopsis stomatal lineage requires a FAMA and RETINOBLASTOMA-RELATED module.",
@@ -17,7 +17,7 @@ var searchResult = {
       "published_on": "2014-11-10",
       "updated_at": "2014-11-18",
       "article_type": "Research Article",
-      "subject": "Neuroscience"
+      "subjects": ["Neuroscience", "Plant biology"]
     },
     {
       "title": "Cyclin D activates the Rb tumor suppressor by mono-phosphorylation.",
@@ -26,7 +26,16 @@ var searchResult = {
       "published_on": "2014-10-10",
       "updated_at": "2014-10-18",
       "article_type": "Research Article",
-      "subject": "Neuroscience"
+      "subjects": ["Neuroscience"]
+    },
+    {
+      "title": "Turning cell cycle entry on its head",
+      "intro": "",
+      "authors": ["Cosetta Bertoli", "Robertus Antonius", "Maria de Bruin"],
+      "published_on": "2014-07-01",
+      "updated_at": "2014-07-18",
+      "article_type": "Insight",
+      "subjects": ["Cell biology", "Genes and chromosomes"]
     }
   ]
 };

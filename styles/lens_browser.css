@@ -90,8 +90,8 @@ a:hover {
 ---------------------------------
 */
 
-#searchbar {
-  position: fixed;
+/*#searchbar {*/
+  /* position: fixed;
   top: 0px;
   left: 0px;
   right: 0px;
@@ -99,30 +99,48 @@ a:hover {
   background: #eee;
   border-bottom: 1px solid #ddd;
   height: 60px;
+  overflow: hidden;*/
+/*}*/
+
+#container {
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
   overflow: hidden;
+  height: 100%;
 }
 
-#results {
+/*#results {
   position: fixed;
   top: 60px;
   bottom: 0px;
   left: 0px;
   right: 0px;
   overflow: hidden;
-}
+}*/
 
 /* Documents result list */
 
+#facets {
+  float: left;
+  height: 100%;
+  width: 20%;
+  background: #f7f7f7;
+  border-right: 1px solid #ddd;
+}
+
 #documents {
   float: left;
-  width: 60%;
+  width: 50%;
   height: 100%;
   border-right: 1px solid #ddd;
 }
 
 #panels {
+  background: #eee;
   float: right;
-  width: 40%;
+  width: 30%;
   height: 100%;
 }
 
@@ -131,30 +149,34 @@ a:hover {
 ---------------------------------
 */
 
-#searchbar .search-field {
+#facets .searchbar {
+  overflow: hidden;
+}
+
+#facets .search-field {
   display: block;
   float: left;
   border: none;
   margin-left: 20px;
   margin-top: 15px;
   height: 30px;
-  width: 300px;
-  padding: 0 10px;
-  font-size: 18px;
+  width: 170px;
+  padding: 0 5px;
+  font-size: 13px;
 }
 
-#searchbar .search-button {
+#facets .search-button {
   margin-top: 15px;
   display: block;
   float: left;
   background: #444;
   height: 30px;
   line-height: 30px;
-  padding: 0px 20px;
+  padding: 0px 10px;
   color: #fff;
 }
 
-#searchbar .search-button:hover {
+#facets .search-button:hover {
   background: #000;
 }
 
@@ -172,6 +194,7 @@ a:hover {
   display: block;
   padding-right: 100px;
   font-size: 20px;
+  line-height: 26px;
   padding-bottom: 10px;
 }
 
@@ -179,8 +202,9 @@ a:hover {
   margin-right: 10px;
 }
 
-#documents .document .authors .author.highlighted {
+#documents .document .facet-occurence.highlighted {
   background: #444;
+  /*border-bottom: 3px solid #4A90E2;*/
   color: white;
 }
 
@@ -188,6 +212,25 @@ a:hover {
   padding-top: 10px;
   font-style: italic;
   color: rgba(0,0,0,0.6);
+}
+
+#documents .document .categories {
+  overflow: hidden;
+  padding: 10px 0;
+}
+
+#documents .document .categories > div {
+  float: left;
+  margin-right: 10px;
+}
+
+#documents .document .subject {
+  font-style: italic;
+  color: #999;
+}
+
+#documents .document .categories .article_type {
+
 }
 
 #documents .document .toggle-preview {
@@ -218,9 +261,8 @@ a:hover {
 }
 
 #facets .facet .facet-values .value {
-  float: left;
+  display: inline-block;
   margin-right: 20px;
-  background: #eee;
   padding: 2px 5px;
 }
 

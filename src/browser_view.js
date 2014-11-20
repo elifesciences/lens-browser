@@ -4,6 +4,7 @@ var _ = require("underscore");
 var View = require("substance-application").View;
 var $$ = require("substance-application").$$;
 
+
 // Browser.View Constructor
 // ========
 //
@@ -20,47 +21,49 @@ var BrowserView = function(controller) {
   // Search bar
   // ------------
 
-  this.searchbarEl = $$('#searchbar', {html: ''});
-  this.searchFieldEl = $$('input.search-field', {type: "text"});
-  this.searchbarEl.appendChild(this.searchFieldEl);
-  this.searchButton = $$('a.search-button' , {href: "#", text: 'Search'});
-  this.searchbarEl.appendChild(this.searchButton);
+  // this.searchbarEl = $$('#searchbar', {html: ''});
+  // this.searchFieldEl = $$('input.search-field', {type: "text"});
+  // this.searchbarEl.appendChild(this.searchFieldEl);
+  // this.searchButton = $$('a.search-button' , {href: "#", text: 'Search'});
+  // this.searchbarEl.appendChild(this.searchButton);
 
   // Results
   // ------------
 
-  this.resultsEl = $$('#results');
+  // this.resultsEl = $$('#results');
+  // this.resultsEl.appendChild(this.searchbarEl);
 
   // List of found documents
   // ------------
   // 
   // Left floated 60%
 
+  this.facetsEl = $$('#facets');
+  // this.panelsEl.appendChild(this.facetsEl);
+
   this.documentsEl = $$('#documents');
-  this.resultsEl.appendChild(this.documentsEl);
+  // this.el.appendChild(this.documentsEl);
+  // this.elementIndex = {};
 
   // Panel Wrapper
   // ------------
   //
-  // Right floated 40%
+  // Left floated 25%
 
-  this.panelsEl = $$('#panels');
-  this.resultsEl.appendChild(this.panelsEl);
+  // this.panelsEl = $$('#panels');
+  // this.resultsEl.appendChild(this.panelsEl);
 
-  this.facetsEl = $$('#facets');
-  this.panelsEl.appendChild(this.facetsEl);
+  this.previewEl = $$('#preview');
+  // this.panelsEl.appendChild(this.previewEl);
 
-  this.previewEl = $$('#previewEl');
-  this.panelsEl.appendChild(this.previewEl);
-
-  this.elementIndex = {};
 
   // Event handlers
   // ------------
 
-  $(this.searchButton).click(_.bind(this.startSearch, this));
+  // $(this.searchButton).click(_.bind(this.startSearch, this));
   this.$el.on('click', '.value', _.bind(this.toggleFilter, this));
 };
+
 
 BrowserView.Prototype = function() {
 
@@ -136,12 +139,36 @@ BrowserView.Prototype = function() {
     }
   };
 
+  this.clearElementRegistry = function() {
+    this.elementIndex = {};
+  };
+
+  // Register DOM element in element registry for easy lookup by key later
+  this.registerElement = function(facetName, value, el) {
+    if (!this.elementIndex[facetName]) {
+      this.elementIndex[facetName] = {};
+    };
+
+    if (!this.elementIndex[facetName][value]) {
+      this.elementIndex[facetName][value] = [];
+    }
+
+    this.elementIndex[facetName][value].push(el);
+    // this.elementIndex[facetName][value] = el;
+  };
+
+  // Get DOM element from element registry
+  this.getElements = function(facetName, value) {
+    if (!this.elementIndex[facetName]) return null;
+    return this.elementIndex[facetName][value];
+  };
+
   // Display initial search result
   this.renderSearchResult = function() {
     this.documentsEl.innerHTML = "";
 
-    // Reset element index
-    this.elementIndex = {};
+    // Clear element index
+    this.clearElementRegistry();
 
     // Get filtered documents
     var documents = this.controller.searchResult.getDocuments();
@@ -151,8 +178,21 @@ BrowserView.Prototype = function() {
 
       _.each(doc.authors, function(author) {
         var authorEl = $$('span.author.facet-occurence', {text: author});
-        this.elementIndex["authors/"+author] = authorEl;
+        this.registerElement("authors", author, authorEl);
         authors.push(authorEl);
+      }, this);
+
+      var categoriesEl = $$('.categories');
+
+      var articleTypeEl = $$('.article_type.facet-occurence', {text: doc.article_type });
+      categoriesEl.appendChild(articleTypeEl);
+      this.registerElement("article_type", doc.article_type, articleTypeEl);
+
+      // Iterate over subjects and display
+      _.each(doc.subjects, function(subject) {
+        var subjectEl = $$('.subject.facet-occurence', {text: subject});
+        categoriesEl.appendChild(subjectEl);
+        this.registerElement("subjects", subject, subjectEl);
       }, this);
 
       var documentEl = $$('.document', {children: [
@@ -162,8 +202,10 @@ BrowserView.Prototype = function() {
           children: authors
         }),
         $$('.intro', {text: doc.intro}),
-        $$('.published-on', {text: doc.published_on})
+        categoriesEl,
+        $$('.published-on', {text: new Date(doc.published_on).toDateString() })
       ]});
+
       this.documentsEl.appendChild(documentEl);
     }, this);
 
@@ -172,6 +214,18 @@ BrowserView.Prototype = function() {
 
   this.renderFacets = function() {
     this.facetsEl.innerHTML = "";
+
+
+    this.searchBarEl = $$('.searchbar');
+    this.facetsEl.appendChild(this.searchBarEl);
+
+    this.searchFieldEl = $$('input.search-field', {type: "text"});
+    this.searchBarEl.appendChild(this.searchFieldEl);
+    this.searchButton = $$('a.search-button' , {href: "#", html: '<i class="fa fa-search"></i>'});
+    this.searchBarEl.appendChild(this.searchButton);
+
+    this.availableFacets = $$('.available-facets');
+    this.facetsEl.appendChild(this.availableFacets);
 
     var facets = this.controller.searchResult.getAvailableFacets();
 
@@ -185,16 +239,18 @@ BrowserView.Prototype = function() {
 
       // Filter values + frequency in doc corpus
       _.each(facet.values, function(facetValue) {
-        facetValuesEl.appendChild($$('a.value'+(facetValue.selected ? '.selected' : ''), {
+        var facetValueEl = $$('a.value'+(facetValue.selected ? '.selected' : ''), {
           href: "#",
           "data-facet": facet.property,
           "data-value": facetValue.name,
           text: facetValue.name + " ("+facetValue.frequency+")"
-        }));
+        });
+        // this.registerElement(facet.property, facetValue.name);
+        facetValuesEl.appendChild(facetValueEl);
       }, this);
 
       facetEl.appendChild(facetValuesEl);
-      this.facetsEl.appendChild(facetEl);
+      this.availableFacets.appendChild(facetEl);
     }, this);
 
     this.highlightFacets();
@@ -202,17 +258,17 @@ BrowserView.Prototype = function() {
 
   // Highlight currently filtered facets
   this.highlightFacets = function() {
-    $('.facet-occurence.selected').removeClass('highighted');
+    $('.facet-occurence.highighted').removeClass('highighted');
 
     var filters = this.controller.searchResult.filters;
     _.each(filters, function(facetValues, facetName) {      
       _.each(facetValues, function(val) {
-        var el = this.elementIndex[facetName+"/"+val];
-        if (el) $(el).addClass('highlighted');
+        var els = this.getElements(facetName, val);
+        // if (el) $(el).addClass('highlighted');
+        $(els).addClass('highlighted');
       }, this);
     }, this);
   };
-
 
   this.displayPreview = function() {
     // Hide facets panel and instead show article preview according to state
@@ -220,8 +276,11 @@ BrowserView.Prototype = function() {
 
   this.render = function() {
     this.el.innerHTML = "";
-    this.el.appendChild(this.searchbarEl);
-    this.el.appendChild(this.resultsEl);
+      
+    this.el.appendChild(this.facetsEl);
+    this.el.appendChild(this.documentsEl);
+    this.el.appendChild(this.previewEl);
+
     return this;
   };
 

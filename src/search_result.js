@@ -7,7 +7,7 @@ var _ = require("underscore");
 
 var AVAILABLE_FACETS = {
   "article_type": "Article Type",
-  "subject": "Subject",
+  "subjects": "Subjects",
   "authors": "Authors"
 };
 
@@ -28,6 +28,11 @@ SearchResult.Prototype = function() {
 
   this.filterDocuments = function() {
     this.filteredDocuments = [];
+
+    if (!this.filters || Object.keys(this.filters).length === 0) {
+      this.filteredDocuments = null;
+      return;
+    }
 
     _.each(this.filters, function(filterValues, filterName) {
       console.log('filter', filterValues);
