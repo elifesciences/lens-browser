@@ -35,7 +35,6 @@ SearchResult.Prototype = function() {
     }
 
     _.each(this.filters, function(filterValues, filterName) {
-      console.log('filter', filterValues);
       _.each(filterValues, function(val) {
         var matches = this.facets[filterName][val];
         this.filteredDocuments = _.union(this.filteredDocuments, matches);
@@ -51,26 +50,6 @@ SearchResult.Prototype = function() {
     this.filterDocuments();
   };
 
-  // Set of documents according to search result and set filters
-  // ------------
-
-  // this.addFilter = function(facetName, value) {
-  //   // Implicitly remove a filter if already set
-  //   if (this.isSelected(facetName, value)) {
-  //     this.filters[facetName] = _.without(this.filters[facetName], value);
-      
-  //     if (this.filters[facetName].length === 0) {
-  //       delete this.filters[facetName];
-  //     }
-  //   } else {
-  //     // Add new filter
-  //     if (!this.filters[facetName]) {
-  //       this.filters[facetName] = [];
-  //     }
-
-  //   }
-  //   this.filterDocuments();
-  // };
 
   // Set of documents according to search result and set filters
   // ------------

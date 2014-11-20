@@ -90,19 +90,8 @@ a:hover {
 ---------------------------------
 */
 
-/*#searchbar {*/
-  /* position: fixed;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-
-  background: #eee;
-  border-bottom: 1px solid #ddd;
-  height: 60px;
-  overflow: hidden;*/
-/*}*/
-
 #container {
+  position: absolute;
   top: 0px;
   bottom: 0px;
   left: 0px;
@@ -111,14 +100,27 @@ a:hover {
   height: 100%;
 }
 
-/*#results {
+#searchbar {
   position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+
+  background: #eee;
+  border-bottom: 1px solid #ddd;
+  height: 60px;
+  overflow: hidden;
+}
+
+#container .panel-wrapper {
+  position: absolute;
   top: 60px;
   bottom: 0px;
   left: 0px;
   right: 0px;
   overflow: hidden;
-}*/
+}
+
 
 /* Documents result list */
 
@@ -128,6 +130,7 @@ a:hover {
   width: 20%;
   background: #f7f7f7;
   border-right: 1px solid #ddd;
+  overflow: auto;
 }
 
 #documents {
@@ -137,11 +140,12 @@ a:hover {
   border-right: 1px solid #ddd;
 }
 
-#panels {
-  background: #eee;
+#preview {
+  background: #fff;
   float: right;
   width: 30%;
   height: 100%;
+  overflow: auto;
 }
 
 
@@ -149,23 +153,21 @@ a:hover {
 ---------------------------------
 */
 
-#facets .searchbar {
-  overflow: hidden;
-}
 
-#facets .search-field {
+
+#searchbar .search-field {
   display: block;
   float: left;
   border: none;
   margin-left: 20px;
   margin-top: 15px;
   height: 30px;
-  width: 170px;
+  width: 70%;
   padding: 0 5px;
   font-size: 13px;
 }
 
-#facets .search-button {
+#searchbar .search-button {
   margin-top: 15px;
   display: block;
   float: left;
@@ -176,13 +178,17 @@ a:hover {
   color: #fff;
 }
 
-#facets .search-button:hover {
+#searchbar .search-button:hover {
   background: #000;
 }
 
 /* Documents result list
 ---------------------------------
 */
+
+#documents {
+  overflow: auto;
+}
 
 #documents .document {
   padding: 20px;
@@ -207,6 +213,20 @@ a:hover {
   /*border-bottom: 3px solid #4A90E2;*/
   color: white;
 }
+
+#documents .document .facet-occurence.article_type.highlighted {
+  background: #249fd7;
+  /*border-bottom: 3px solid #4A90E2;*/
+  color: white;
+}
+
+#documents .document .facet-occurence.subjects.highlighted {
+  background: #659e47;
+  /*border-bottom: 3px solid #4A90E2;*/
+  color: white;
+}
+
+
 
 #documents .document .intro {
   padding-top: 10px;
@@ -270,3 +290,17 @@ a:hover {
   background: #444;
   color: white;
 }
+
+/* article type */
+#facets .facet.article_type .facet-values .value.selected {
+  background: #249fd7;
+  color: white;
+}
+
+/* subjects */
+
+#facets .facet.subjects .facet-values .value.selected {
+  background: #659e47;
+  color: white;
+}
+

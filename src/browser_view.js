@@ -21,17 +21,12 @@ var BrowserView = function(controller) {
   // Search bar
   // ------------
 
-  // this.searchbarEl = $$('#searchbar', {html: ''});
-  // this.searchFieldEl = $$('input.search-field', {type: "text"});
-  // this.searchbarEl.appendChild(this.searchFieldEl);
-  // this.searchButton = $$('a.search-button' , {href: "#", text: 'Search'});
-  // this.searchbarEl.appendChild(this.searchButton);
+  this.searchbarEl = $$('#searchbar', {html: ''});
+  this.searchFieldEl = $$('input.search-field', {type: "text"});
+  this.searchbarEl.appendChild(this.searchFieldEl);
+  this.searchButton = $$('a.search-button' , {href: "#", text: 'Search'});
+  this.searchbarEl.appendChild(this.searchButton);
 
-  // Results
-  // ------------
-
-  // this.resultsEl = $$('#results');
-  // this.resultsEl.appendChild(this.searchbarEl);
 
   // List of found documents
   // ------------
@@ -39,28 +34,25 @@ var BrowserView = function(controller) {
   // Left floated 60%
 
   this.facetsEl = $$('#facets');
-  // this.panelsEl.appendChild(this.facetsEl);
 
   this.documentsEl = $$('#documents');
-  // this.el.appendChild(this.documentsEl);
-  // this.elementIndex = {};
 
-  // Panel Wrapper
-  // ------------
-  //
-  // Left floated 25%
+  this.previewEl = $$('#preview', {
+    style: "padding-top: 20px;",
+    html: '<img src="styles/details.png"/>'
+  });
 
-  // this.panelsEl = $$('#panels');
-  // this.resultsEl.appendChild(this.panelsEl);
+  // Wrap what we have into a panel wrapper
+  this.panelWrapperEl = $$('.panel-wrapper');
 
-  this.previewEl = $$('#preview');
-  // this.panelsEl.appendChild(this.previewEl);
-
+  this.panelWrapperEl.appendChild(this.facetsEl);
+  this.panelWrapperEl.appendChild(this.documentsEl);
+  this.panelWrapperEl.appendChild(this.previewEl);
 
   // Event handlers
   // ------------
 
-  // $(this.searchButton).click(_.bind(this.startSearch, this));
+  $(this.searchButton).click(_.bind(this.startSearch, this));
   this.$el.on('click', '.value', _.bind(this.toggleFilter, this));
 };
 
@@ -190,7 +182,7 @@ BrowserView.Prototype = function() {
 
       // Iterate over subjects and display
       _.each(doc.subjects, function(subject) {
-        var subjectEl = $$('.subject.facet-occurence', {text: subject});
+        var subjectEl = $$('.subjects.facet-occurence', {text: subject});
         categoriesEl.appendChild(subjectEl);
         this.registerElement("subjects", subject, subjectEl);
       }, this);
@@ -215,14 +207,13 @@ BrowserView.Prototype = function() {
   this.renderFacets = function() {
     this.facetsEl.innerHTML = "";
 
+    // this.searchBarEl = $$('.searchbar');
+    // this.facetsEl.appendChild(this.searchBarEl);
 
-    this.searchBarEl = $$('.searchbar');
-    this.facetsEl.appendChild(this.searchBarEl);
-
-    this.searchFieldEl = $$('input.search-field', {type: "text"});
-    this.searchBarEl.appendChild(this.searchFieldEl);
-    this.searchButton = $$('a.search-button' , {href: "#", html: '<i class="fa fa-search"></i>'});
-    this.searchBarEl.appendChild(this.searchButton);
+    // this.searchFieldEl = $$('input.search-field', {type: "text"});
+    // this.searchBarEl.appendChild(this.searchFieldEl);
+    // this.searchButton = $$('a.search-button' , {href: "#", html: '<i class="fa fa-search"></i>'});
+    // this.searchBarEl.appendChild(this.searchButton);
 
     this.availableFacets = $$('.available-facets');
     this.facetsEl.appendChild(this.availableFacets);
@@ -231,7 +222,7 @@ BrowserView.Prototype = function() {
 
     // Render facets
     _.each(facets, function(facet) {
-      var facetEl = $$('.facet');
+      var facetEl = $$('.facet.'+facet.property);
 
       // Filter name
       facetEl.appendChild($$('.facet-name', { text: facet.name }));
@@ -264,7 +255,6 @@ BrowserView.Prototype = function() {
     _.each(filters, function(facetValues, facetName) {      
       _.each(facetValues, function(val) {
         var els = this.getElements(facetName, val);
-        // if (el) $(el).addClass('highlighted');
         $(els).addClass('highlighted');
       }, this);
     }, this);
@@ -276,10 +266,9 @@ BrowserView.Prototype = function() {
 
   this.render = function() {
     this.el.innerHTML = "";
-      
-    this.el.appendChild(this.facetsEl);
-    this.el.appendChild(this.documentsEl);
-    this.el.appendChild(this.previewEl);
+    
+    this.el.appendChild(this.searchbarEl);  
+    this.el.appendChild(this.panelWrapperEl);
 
     return this;
   };
