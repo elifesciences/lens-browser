@@ -189,7 +189,7 @@ BrowserView.Prototype = function() {
 
       var documentEl = $$('.document', {children: [
         $$('a.toggle-preview', {href: '#', html: '<i class="fa fa-eye"></i> Preview'}),
-        $$('a.title', {href: '#', text: doc.title}),
+        $$('a.title', {href: '#', html: doc.title}),
         $$('.authors', {
           children: authors
         }),

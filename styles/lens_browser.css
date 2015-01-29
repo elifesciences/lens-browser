@@ -249,6 +249,10 @@ a:hover {
   color: #999;
 }
 
+#documents .document .query-string {
+  background: #eee;
+}
+
 #documents .document .categories .article_type {
 
 }

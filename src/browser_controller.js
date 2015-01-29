@@ -12,8 +12,9 @@ var exampleSearchResult = require("../data/searchresult");
 // BrowserController
 // =============================
 
-var BrowserController = function(app) {
+var BrowserController = function(app, config) {
   Controller.call(this, app);
+  this.config = config;
 
   this.createView();
 };
@@ -74,10 +75,21 @@ BrowserController.Prototype = function() {
 
   this.loadSearchResult = function(newState, cb) {
     // Get filters from app state
+    var searchStr = newState.searchstr;
     var filters = this.getFilters(newState);
+    var self = this;
 
-    this.searchResult = new SearchResult(exampleSearchResult, filters);
-    cb(null);
+    $.getJSON(this.config.api_url+"/search?searchString="+encodeURIComponent(searchStr), function(data) {
+
+      // TODO: this structure should be provided on the server
+      self.searchResult = new SearchResult({
+        query: newState.searchstr,
+        documents: data
+      }, filters);
+      cb(null);
+    });
+
+    // this.searchResult = new SearchResult(exampleSearchResult, filters);    
   };
 
   this.afterTransition = function(oldState) {
