@@ -21,6 +21,9 @@ var BrowserView = function(controller) {
   // Search bar
   // ------------
 
+
+  console.log('state', this.controller.state);
+
   this.searchbarEl = $$('#searchbar', {html: ''});
   this.searchFieldEl = $$('input.search-field', {type: "text"});
   this.searchbarEl.appendChild(this.searchFieldEl);
@@ -34,12 +37,10 @@ var BrowserView = function(controller) {
   // Left floated 60%
 
   this.facetsEl = $$('#facets');
-
   this.documentsEl = $$('#documents');
 
   this.previewEl = $$('#preview', {
-    style: "padding-top: 20px;",
-    html: '<img src="styles/details.png"/>'
+    
   });
 
   // Wrap what we have into a panel wrapper
@@ -53,7 +54,9 @@ var BrowserView = function(controller) {
   // ------------
 
   $(this.searchButton).click(_.bind(this.startSearch, this));
+  $(this.searchFieldEl).change(_.bind(this.startSearch, this));
   this.$el.on('click', '.value', _.bind(this.toggleFilter, this));
+  this.$el.on('click', '.toggle-preview', _.bind(this.togglePreview, this));
 };
 
 
@@ -72,6 +75,26 @@ BrowserView.Prototype = function() {
         searchstr: searchstr
       });
     }
+  };
+
+  this.togglePreview = function(e) {
+    e.preventDefault();
+
+    var documentId = $(e.currentTarget).parent().attr('data-id');
+    var filters = this.controller.searchResult.filters;
+
+    // Update state
+    this.controller.switchState({
+      id: "main",
+      searchstr: this.controller.state.searchstr,
+      documentId: documentId,
+      filters: JSON.stringify(filters)
+    });
+
+    // var searchStr = this.controller.state.searchstr;
+    // this.controller.loadPreview(documentId, function(err, preview) {
+    //   console.log('preview', preview);
+    // });
   };
 
   this.toggleFilter = function(e) {
@@ -113,11 +136,14 @@ BrowserView.Prototype = function() {
   //
 
   // After state transition
+  // --------------
+
   this.afterTransition = function(oldState, newState) {
     console.log('after transition');
     if (newState.id === "main") {
+      $(this.searchFieldEl).attr({value: newState.searchstr});
+
       if (newState.searchstr) {
-        // console.log('MEH', newState.searchstr);
         this.renderSearchResult();
         // if the search has not changed then 'likely' the filter has
         // TODO: could be detected more explicitly
@@ -127,9 +153,13 @@ BrowserView.Prototype = function() {
         }
       } else {
         // TODO: render 'moderated' list of documents
+        alert('no search string specified');
       }
     }
   };
+
+  // Clear element registry
+  // --------------
 
   this.clearElementRegistry = function() {
     this.elementIndex = {};
@@ -187,21 +217,25 @@ BrowserView.Prototype = function() {
         this.registerElement("subjects", subject, subjectEl);
       }, this);
 
-      var documentEl = $$('.document', {children: [
-        $$('a.toggle-preview', {href: '#', html: '<i class="fa fa-eye"></i> Preview'}),
-        $$('a.title', {href: '#', html: doc.title}),
-        $$('.authors', {
-          children: authors
-        }),
-        $$('.intro', {text: doc.intro}),
-        categoriesEl,
-        $$('.published-on', {text: new Date(doc.published_on).toDateString() })
-      ]});
+      var documentEl = $$('.document', {
+        "data-id": doc.id,
+        children: [
+          $$('a.toggle-preview', {href: '#', html: '<i class="fa fa-eye"></i> Preview'}),
+          $$('a.title', {href: '#', html: doc.title}),
+          $$('.authors', {
+            children: authors
+          }),
+          $$('.intro', {text: doc.intro}),
+          categoriesEl,
+          $$('.published-on', {text: new Date(doc.published_on).toDateString() })
+        ]
+      });
 
       this.documentsEl.appendChild(documentEl);
     }, this);
-
+  
     this.renderFacets();
+    this.renderPreview();
   };
 
   this.renderFacets = function() {
@@ -260,8 +294,18 @@ BrowserView.Prototype = function() {
     }, this);
   };
 
-  this.displayPreview = function() {
-    // Hide facets panel and instead show article preview according to state
+  this.renderPreview = function() {
+    this.previewEl.innerHTML = "";
+
+    var previewData = this.controller.previewData;
+    console.log('rendering previewData', previewData);
+
+    _.each(previewData.fragments, function(fragment) {
+      this.previewEl.appendChild($$('.fragment', {
+        html: fragment.content
+      }));
+    }, this);
+    
   };
 
   this.render = function() {

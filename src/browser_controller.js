@@ -76,8 +76,11 @@ BrowserController.Prototype = function() {
   this.loadSearchResult = function(newState, cb) {
     // Get filters from app state
     var searchStr = newState.searchstr;
+    var documentId = newState.documentId;
     var filters = this.getFilters(newState);
     var self = this;
+
+    console.log('documentId', documentId);
 
     $.getJSON(this.config.api_url+"/search?searchString="+encodeURIComponent(searchStr), function(data) {
 
@@ -86,7 +89,25 @@ BrowserController.Prototype = function() {
         query: newState.searchstr,
         documents: data
       }, filters);
-      cb(null);
+
+      // Load preview
+      if (documentId) {
+        $.ajax({
+          url: self.config.api_url+"/search/document?documentId="+encodeURIComponent(documentId)+"&searchString="+encodeURIComponent(searchStr),
+          dataType: 'json',
+          success: function(data) {
+            self.previewData = data;
+            cb(null);
+          },
+          error: function(err) {
+            console.error(err.responseText);
+            cb(err.responseText);
+          }
+        });
+      } else {
+        self.previewData = null;
+        cb(null);
+      }
     });
 
     // this.searchResult = new SearchResult(exampleSearchResult, filters);    

@@ -19,7 +19,6 @@ LensBrowserApplication.Prototype = function() {
   this.start = function(options) {
     __super__.start.call(this, options);
 
-
     // Inject main view
     this.el.appendChild(this.controller.view.el);
 

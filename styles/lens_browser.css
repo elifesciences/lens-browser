@@ -140,12 +140,23 @@ a:hover {
   border-right: 1px solid #ddd;
 }
 
+
+/* Search bar
+---------------------------------
+*/
+
 #preview {
   background: #fff;
   float: right;
   width: 30%;
   height: 100%;
   overflow: auto;
+  padding: 20px;
+  line-height: 20px;
+}
+
+#preview .fragment {
+  padding-bottom: 20px;
 }
 
 
@@ -249,8 +260,8 @@ a:hover {
   color: #999;
 }
 
-#documents .document .query-string {
-  background: #eee;
+.query-string {
+  background: #ccc;
 }
 
 #documents .document .categories .article_type {
