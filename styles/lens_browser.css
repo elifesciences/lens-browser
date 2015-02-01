@@ -151,6 +151,7 @@ a:hover {
   width: 30%;
   height: 100%;
   overflow: auto;
+  font-size: 12px;
   padding: 20px;
   line-height: 20px;
 }
@@ -198,8 +199,10 @@ a:hover {
 */
 
 #documents {
+  position: relative;
   overflow: auto;
 }
+
 
 #documents .document {
   padding: 20px;
@@ -207,9 +210,11 @@ a:hover {
   border-bottom: 1px solid #ddd;
 }
 
+
+
 #documents .document .title {
   display: block;
-  padding-right: 100px;
+  margin-right: 130px;
   font-size: 20px;
   line-height: 26px;
   padding-bottom: 10px;
@@ -268,12 +273,28 @@ a:hover {
 
 }
 
+
 #documents .document .toggle-preview {
   display: block;
   color: rgba(11, 157, 217, 1);
   position: absolute;
-  top: 20px;
-  right: 20px;
+  padding: 20px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-right: 3px solid transparent;
+  z-index: 5000;
+}
+
+#documents .document:hover .toggle-preview {
+  border-right: 3px solid rgba(0, 0, 0, 0.1);
+}
+
+#documents .document.active .toggle-preview {
+  border-right: 3px solid rgba(11, 157, 217, 1);
 }
 
 /* Facets panel
@@ -296,7 +317,7 @@ a:hover {
 }
 
 #facets .facet .facet-values .value {
-  display: inline-block;
+  display: block;
   margin-right: 20px;
   padding: 2px 5px;
 }

@@ -120,11 +120,14 @@ SearchResult.Prototype = function() {
         });
       }, this);
 
-      availableFacets.push({
-        property: key,
-        name: AVAILABLE_FACETS[key],
-        values: richValues
-      });
+      if (richValues.length > 1) {
+        availableFacets.push({
+          property: key,
+          name: AVAILABLE_FACETS[key],
+          values: richValues
+        });        
+      }
+
     }, this);
     return availableFacets;
   };

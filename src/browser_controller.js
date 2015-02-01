@@ -6,7 +6,7 @@ var Controller = require("substance-application").Controller;
 var BrowserView = require("./browser_view");
 var SearchResult = require("./search_result");
 
-var exampleSearchResult = require("../data/searchresult");
+// var exampleSearchResult = require("../data/searchresult");
 
 
 // BrowserController
@@ -46,14 +46,57 @@ BrowserController.Prototype = function() {
     //   if (skip) return cb(null, {skip: true});
     // }
 
-    if (newState.id === "main" && newState.searchstr && newState.searchstr !== this.state.searchstr) {
-      this.loadSearchResult(newState, cb);
-    } else if (newState.id === "main" && newState.searchstr === this.state.searchstr && newState.filters !== this.state.filters) {
-      this.filterDocuments(newState, cb);
+    if (newState.id === "main") {
+
+      // Handle edge case: no searchstr provided
+      // TODO: load a set of featured articles
+      if (!newState.searchstr) return cb(null);
+
+      
+      if (newState.searchstr !== this.state.searchstr) {
+        // Search result has changed
+        this.loadSearchResult(newState, cb);
+      } else if (newState.filters !== this.state.filters) {
+        // Filters have been changed
+        this.filterDocuments(newState, cb);
+      } else if (newState.documentId && newState.documentId !== this.state.documentId) {
+        // Selected document has been changed
+        console.log('loading preview...');
+        this.loadPreview(newState, cb);
+      } else {
+        console.log('state not explicitly handled', this.state, newState);
+        cb(null);
+      }
+
+      // Search result has changed
+      // if (newState.searchstr !== this.state.searchstr) {
+      //   if (newState.documentId && newState.documentId !== this.state.documentId) {
+      //     this.loadSearchResultAndPreview(newState, cb);
+      //   } else {
+      //     this.loadSearchResult(newState, cb);
+      //   }
+      // } else {
+      //   // Filters have changed
+      //   if (newState.filters !== this.state.filters) {
+      //     this.filterDocuments(newState, cb);
+      //   }
+      //   if (newState.documentId && newState.documentId !== this.state.documentId) {
+      //   }
+      // }
+
     } else {
       console.log('state not explicitly handled', this.state, newState);
-      cb(null);  
+      cb(null);
     }
+
+    // else if (newState.id === "main" && newState.documentId && newState.documentId !== this.state.documentId) {
+    //   // previewed document changed within existing search result
+    //   this.loadPreview(newState, cb);
+    // } else if (newState.id === "main" && newState.searchstr === this.state.searchstr && newState.filters !== this.state.filters) {
+    //   this.filterDocuments(newState, cb);
+    // } else {
+    //   cb(null);  
+    // }
     
   };
 
@@ -67,11 +110,58 @@ BrowserController.Prototype = function() {
     return JSON.parse(newState.filters);
   };
 
+  // Filter documents according to new filter criteria
+  // -----------------------
+  // 
+
   this.filterDocuments = function(newState, cb) {
     var filters = this.getFilters(newState);
     this.searchResult.applyFilters(filters);
     cb(null);
   };
+
+  // Load a new preview
+  // -----------------------
+  // 
+
+  // this.loadSearchResultAndPreview = function(newState, cb) {
+  //   var self = this;
+  //   this.loadSearchResult(newState, function() {
+  //     self.loadPreview(newState, cb);
+  //   });
+  // };
+
+  // Load preview
+  // -----------------------
+  // 
+
+  this.loadPreview = function(newState, cb) {
+    // Get filters from app state
+    var searchStr = newState.searchstr;
+    var documentId = newState.documentId;
+    var filters = this.getFilters(newState);
+    var self = this;
+
+    $.ajax({
+      url: self.config.api_url+"/search/document?documentId="+encodeURIComponent(documentId)+"&searchString="+encodeURIComponent(searchStr),
+      dataType: 'json',
+      success: function(data) {
+        self.previewData = data;
+        cb(null);
+      },
+      error: function(err) {
+        console.error(err.responseText);
+        cb(err.responseText);
+      }
+    });
+  };
+
+  // Search result gets loaded
+  // -----------------------
+  // 
+  // Filters must be applied too, if there are any
+  // Preview must be loaded as well, if documentId is provided
+  // TODO: error handling
 
   this.loadSearchResult = function(newState, cb) {
     // Get filters from app state
@@ -82,31 +172,26 @@ BrowserController.Prototype = function() {
 
     console.log('documentId', documentId);
 
-    $.getJSON(this.config.api_url+"/search?searchString="+encodeURIComponent(searchStr), function(data) {
+    $.ajax({
+      url: this.config.api_url+"/search?searchString="+encodeURIComponent(searchStr),
+      dataType: 'json',
+      success: function(data) {
+        // TODO: this structure should be provided on the server
+        self.searchResult = new SearchResult({
+          query: newState.searchstr,
+          documents: data
+        }, filters);
 
-      // TODO: this structure should be provided on the server
-      self.searchResult = new SearchResult({
-        query: newState.searchstr,
-        documents: data
-      }, filters);
-
-      // Load preview
-      if (documentId) {
-        $.ajax({
-          url: self.config.api_url+"/search/document?documentId="+encodeURIComponent(documentId)+"&searchString="+encodeURIComponent(searchStr),
-          dataType: 'json',
-          success: function(data) {
-            self.previewData = data;
-            cb(null);
-          },
-          error: function(err) {
-            console.error(err.responseText);
-            cb(err.responseText);
-          }
-        });
-      } else {
-        self.previewData = null;
-        cb(null);
+        if (documentId) {
+          self.loadPreview(newState, cb);
+        } else {
+          self.previewData = null;
+          cb(null);
+        }
+      },
+      error: function(err) {
+        console.error(err.responseText);
+        cb(err.responseText);
       }
     });
 
@@ -117,7 +202,6 @@ BrowserController.Prototype = function() {
     var newState = this.state;
     this.view.afterTransition(oldState, newState);
   };
-
 };
 
 BrowserController.Prototype.prototype = Controller.prototype;

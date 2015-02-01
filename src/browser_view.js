@@ -147,10 +147,10 @@ BrowserView.Prototype = function() {
         this.renderSearchResult();
         // if the search has not changed then 'likely' the filter has
         // TODO: could be detected more explicitly
-        if (oldState.searchstr === newState.searchstr) {
-          console.log('filters have been changed...');
-          this.renderSearchResult();
-        }
+        // if (oldState.searchstr === newState.searchstr) {
+        //   console.log('filters have been changed...');
+        //   this.renderSearchResult();
+        // }
       } else {
         // TODO: render 'moderated' list of documents
         alert('no search string specified');
@@ -174,9 +174,7 @@ BrowserView.Prototype = function() {
     if (!this.elementIndex[facetName][value]) {
       this.elementIndex[facetName][value] = [];
     }
-
     this.elementIndex[facetName][value].push(el);
-    // this.elementIndex[facetName][value] = el;
   };
 
   // Get DOM element from element registry
@@ -188,6 +186,10 @@ BrowserView.Prototype = function() {
   // Display initial search result
   this.renderSearchResult = function() {
     this.documentsEl.innerHTML = "";
+
+    // highlight previewed document
+    var documentId = this.controller.state.documentId;
+    // console.log('meh', this.$('.document[data-id='+documentId+']'));
 
     // Clear element index
     this.clearElementRegistry();
@@ -205,7 +207,6 @@ BrowserView.Prototype = function() {
       }, this);
 
       var categoriesEl = $$('.categories');
-
       var articleTypeEl = $$('.article_type.facet-occurence', {text: doc.article_type });
       categoriesEl.appendChild(articleTypeEl);
       this.registerElement("article_type", doc.article_type, articleTypeEl);
@@ -221,7 +222,9 @@ BrowserView.Prototype = function() {
         "data-id": doc.id,
         children: [
           $$('a.toggle-preview', {href: '#', html: '<i class="fa fa-eye"></i> Preview'}),
-          $$('a.title', {href: '#', html: doc.title}),
+          $$('.title', {
+            children: [$$('a', {href: '#', html: doc.title})]
+          }),
           $$('.authors', {
             children: authors
           }),
@@ -230,6 +233,10 @@ BrowserView.Prototype = function() {
           $$('.published-on', {text: new Date(doc.published_on).toDateString() })
         ]
       });
+
+      if (documentId === doc.id) {
+        documentEl.classList.add("active");
+      }
 
       this.documentsEl.appendChild(documentEl);
     }, this);
@@ -270,6 +277,7 @@ BrowserView.Prototype = function() {
           "data-value": facetValue.name,
           text: facetValue.name + " ("+facetValue.frequency+")"
         });
+
         // this.registerElement(facet.property, facetValue.name);
         facetValuesEl.appendChild(facetValueEl);
       }, this);
@@ -298,6 +306,7 @@ BrowserView.Prototype = function() {
     this.previewEl.innerHTML = "";
 
     var previewData = this.controller.previewData;
+    if (!previewData) return;
     console.log('rendering previewData', previewData);
 
     _.each(previewData.fragments, function(fragment) {
@@ -305,15 +314,12 @@ BrowserView.Prototype = function() {
         html: fragment.content
       }));
     }, this);
-    
   };
 
   this.render = function() {
     this.el.innerHTML = "";
-    
     this.el.appendChild(this.searchbarEl);  
     this.el.appendChild(this.panelWrapperEl);
-
     return this;
   };
 
