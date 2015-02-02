@@ -100,7 +100,7 @@ a:hover {
   height: 100%;
 }
 
-#searchbar {
+.searchbar {
   position: fixed;
   top: 0px;
   left: 0px;
@@ -141,7 +141,7 @@ a:hover {
 }
 
 
-/* Search bar
+/* Preview
 ---------------------------------
 */
 
@@ -165,9 +165,7 @@ a:hover {
 ---------------------------------
 */
 
-
-
-#searchbar .search-field {
+.searchbar .search-field {
   display: block;
   float: left;
   border: none;
@@ -179,7 +177,7 @@ a:hover {
   font-size: 13px;
 }
 
-#searchbar .search-button {
+.searchbar .search-button {
   margin-top: 15px;
   display: block;
   float: left;
@@ -190,7 +188,7 @@ a:hover {
   color: #fff;
 }
 
-#searchbar .search-button:hover {
+.searchbar .search-button:hover {
   background: #000;
 }
 
@@ -242,8 +240,6 @@ a:hover {
   color: white;
 }
 
-
-
 #documents .document .intro {
   padding-top: 10px;
   font-style: italic;
@@ -272,7 +268,6 @@ a:hover {
 #documents .document .categories .article_type {
 
 }
-
 
 #documents .document .toggle-preview {
   display: block;

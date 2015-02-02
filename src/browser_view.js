@@ -24,11 +24,13 @@ var BrowserView = function(controller) {
 
   console.log('state', this.controller.state);
 
-  this.searchbarEl = $$('#searchbar', {html: ''});
-  this.searchFieldEl = $$('input.search-field', {type: "text"});
-  this.searchbarEl.appendChild(this.searchFieldEl);
-  this.searchButton = $$('a.search-button' , {href: "#", text: 'Search'});
-  this.searchbarEl.appendChild(this.searchButton);
+  this.searchbarView = this.controller.searchbarCtrl.createView();
+
+  // this.searchbarEl = $$('#searchbar', {html: ''});
+  // this.searchFieldEl = $$('input.search-field', {type: "text"});
+  // this.searchbarEl.appendChild(this.searchFieldEl);
+  // this.searchButton = $$('a.search-button' , {href: "#", text: 'Search'});
+  // this.searchbarEl.appendChild(this.searchButton);
 
 
   // List of found documents
@@ -318,7 +320,7 @@ BrowserView.Prototype = function() {
 
   this.render = function() {
     this.el.innerHTML = "";
-    this.el.appendChild(this.searchbarEl);  
+    this.el.appendChild(this.searchbarView.el);  
     this.el.appendChild(this.panelWrapperEl);
     return this;
   };

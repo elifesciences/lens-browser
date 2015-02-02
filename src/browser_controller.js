@@ -5,6 +5,7 @@ var util = require("substance-util");
 var Controller = require("substance-application").Controller;
 var BrowserView = require("./browser_view");
 var SearchResult = require("./search_result");
+var SearchBarController = require("./searchbar_controller");
 
 // var exampleSearchResult = require("../data/searchresult");
 
@@ -15,6 +16,8 @@ var SearchResult = require("./search_result");
 var BrowserController = function(app, config) {
   Controller.call(this, app);
   this.config = config;
+
+  this.searchbarCtrl = new SearchBarController(this);
 
   this.createView();
 };
@@ -68,36 +71,11 @@ BrowserController.Prototype = function() {
         cb(null);
       }
 
-      // Search result has changed
-      // if (newState.searchstr !== this.state.searchstr) {
-      //   if (newState.documentId && newState.documentId !== this.state.documentId) {
-      //     this.loadSearchResultAndPreview(newState, cb);
-      //   } else {
-      //     this.loadSearchResult(newState, cb);
-      //   }
-      // } else {
-      //   // Filters have changed
-      //   if (newState.filters !== this.state.filters) {
-      //     this.filterDocuments(newState, cb);
-      //   }
-      //   if (newState.documentId && newState.documentId !== this.state.documentId) {
-      //   }
-      // }
-
     } else {
       console.log('state not explicitly handled', this.state, newState);
       cb(null);
     }
 
-    // else if (newState.id === "main" && newState.documentId && newState.documentId !== this.state.documentId) {
-    //   // previewed document changed within existing search result
-    //   this.loadPreview(newState, cb);
-    // } else if (newState.id === "main" && newState.searchstr === this.state.searchstr && newState.filters !== this.state.filters) {
-    //   this.filterDocuments(newState, cb);
-    // } else {
-    //   cb(null);  
-    // }
-    
   };
 
   this.encodeFilters = function() {

@@ -25,7 +25,6 @@ LensBrowserApplication.Prototype = function() {
     if (!window.location.hash) {
       this.switchState([{ id: "main" }], { updateRoute: true, replace: true });
     }
-
   };
 };
 
