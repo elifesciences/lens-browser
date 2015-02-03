@@ -109,7 +109,8 @@ a:hover {
   background: #eee;
   border-bottom: 1px solid #ddd;
   height: 60px;
-  overflow: hidden;
+  overflow: visible;
+  z-index: 30000;
 }
 
 #container .panel-wrapper {
@@ -165,7 +166,10 @@ a:hover {
 ---------------------------------
 */
 
-.searchbar .search-field {
+
+
+
+.search-field {
   display: block;
   float: left;
   border: none;
@@ -175,13 +179,68 @@ a:hover {
   width: 70%;
   padding: 0 5px;
   font-size: 13px;
+  background: #fff;
+  position: relative;
+}
+
+.search-field-filters {
+  height: 30px;
+  padding: 5px;
+  /*background: blue;*/
+  float: left;
+  overflow: hidden;
+}
+
+.search-field-filter {
+  float: left;
+  background: #ccc;
+  padding: 0px 5px;
+  margin-right: 2px;
+  
+  /*margin-top: 5px;*/
+  height: 20px;
+  line-height: 20px;
+}
+
+
+.search-field-input {
+  margin-top: 5px;
+  font-family: 'Source Sans Pro', Helvetica, Arial, Verdana, sans-serif;
+  /*background: #ccc;*/
+  height: 20px;
+  width: 400px;
+  font-size: 16px;
+  line-height: 20px;
+  border: none;
+}
+
+/* Suggestions */
+.search-field-suggestions {
+  position: absolute;
+  top: 30px;
+  left: 0px;
+  right: 0px;
+  background: white;
+  border: 1px solid #ddd;
+
+}
+
+.search-field-suggestion {
+  color: #444;
+  padding: 5px 5px;
+  display: block;
+}
+
+.search-field-suggestion:hover {
+  color: #444;
+  background: #eee;
 }
 
 .searchbar .search-button {
   margin-top: 15px;
   display: block;
   float: left;
-  background: #444;
+  background: #4A90E2;
   height: 30px;
   line-height: 30px;
   padding: 0px 10px;
@@ -189,7 +248,7 @@ a:hover {
 }
 
 .searchbar .search-button:hover {
-  background: #000;
+  background: #2A6AB6;
 }
 
 /* Documents result list

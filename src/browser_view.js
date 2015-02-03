@@ -21,17 +21,7 @@ var BrowserView = function(controller) {
   // Search bar
   // ------------
 
-
-  console.log('state', this.controller.state);
-
   this.searchbarView = this.controller.searchbarCtrl.createView();
-
-  // this.searchbarEl = $$('#searchbar', {html: ''});
-  // this.searchFieldEl = $$('input.search-field', {type: "text"});
-  // this.searchbarEl.appendChild(this.searchFieldEl);
-  // this.searchButton = $$('a.search-button' , {href: "#", text: 'Search'});
-  // this.searchbarEl.appendChild(this.searchButton);
-
 
   // List of found documents
   // ------------
@@ -250,14 +240,6 @@ BrowserView.Prototype = function() {
   this.renderFacets = function() {
     this.facetsEl.innerHTML = "";
 
-    // this.searchBarEl = $$('.searchbar');
-    // this.facetsEl.appendChild(this.searchBarEl);
-
-    // this.searchFieldEl = $$('input.search-field', {type: "text"});
-    // this.searchBarEl.appendChild(this.searchFieldEl);
-    // this.searchButton = $$('a.search-button' , {href: "#", html: '<i class="fa fa-search"></i>'});
-    // this.searchBarEl.appendChild(this.searchButton);
-
     this.availableFacets = $$('.available-facets');
     this.facetsEl.appendChild(this.availableFacets);
 
@@ -320,7 +302,7 @@ BrowserView.Prototype = function() {
 
   this.render = function() {
     this.el.innerHTML = "";
-    this.el.appendChild(this.searchbarView.el);  
+    this.el.appendChild(this.searchbarView.render().el);  
     this.el.appendChild(this.panelWrapperEl);
     return this;
   };
