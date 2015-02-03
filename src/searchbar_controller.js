@@ -5,7 +5,6 @@ var util = require("substance-util");
 var Controller = require("substance-application").Controller;
 var SearchbarView = require("./searchbar_view");
 
-
 // Static fixture for suggested filters
 // -------------------------
 
@@ -55,6 +54,11 @@ var SearchbarController = function(app, config) {
 
   this.config = config;
 
+  this.filters = [
+    {facet: "subjects", value: "Biochemistry"},
+    {facet: "authors", value: "Michael Aufreiter"}
+  ];
+
   this.createView();
 };
 
@@ -75,17 +79,28 @@ SearchbarController.Prototype = function() {
     return this.view;
   };
 
-  this.transition = function(newState, cb) {
+  // this.transition = function(newState, cb) {
+  // };
+
+  // Add a new search filter
+  // ----------------------
+
+  this.addFilter = function(facet, value) {
+    this.filters.push({
+      facet: facet,
+      value: value
+    });
+  };
+
+  this.removeLastFilter = function() {
+    this.filters.pop();
   };
 
   // Get currently selected filters
   // ----------------------
 
   this.getFilters = function() {
-    return [
-      {facet: "subjects", value: "Biochemistry"},
-      {facet: "authors", value: "Michael Aufreiter"}
-    ];
+    return this.filters;
   };
 
   // Get currently selected filters

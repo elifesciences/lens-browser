@@ -30,10 +30,7 @@ var BrowserView = function(controller) {
 
   this.facetsEl = $$('#facets');
   this.documentsEl = $$('#documents');
-
-  this.previewEl = $$('#preview', {
-    
-  });
+  this.previewEl = $$('#preview');
 
   // Wrap what we have into a panel wrapper
   this.panelWrapperEl = $$('.panel-wrapper');
@@ -49,6 +46,9 @@ var BrowserView = function(controller) {
   $(this.searchFieldEl).change(_.bind(this.startSearch, this));
   this.$el.on('click', '.value', _.bind(this.toggleFilter, this));
   this.$el.on('click', '.toggle-preview', _.bind(this.togglePreview, this));
+
+  // Should this work on the controller?
+  this.searchbarView.on('search:changed', _.bind(this.startSearch, this));
 };
 
 
@@ -57,14 +57,16 @@ BrowserView.Prototype = function() {
   // Session Event handlers
   // --------
   //
+  // TODO: consider global filters (subject selection etc.)
 
   this.startSearch = function(e) {
-    e.preventDefault();
-    var searchstr = $(this.searchFieldEl).val();
-    if (searchstr) {
+    var searchData = this.searchbarView.getSearchData();
+    console.log('le searchdata', searchData);
+
+    if (searchData.searchStr) {
       this.controller.switchState({
         id: "main",
-        searchstr: searchstr
+        searchstr: searchData.searchStr
       });
     }
   };

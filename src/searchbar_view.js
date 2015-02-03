@@ -39,66 +39,107 @@ var SearchbarView = function(controller) {
   // ------------
 
   $(this.searchFieldInputEl).keyup(_.bind(this._updateSuggestions, this));
+  
+  $(this.searchFieldInputEl).keydown(_.bind(this._interpretKey, this));
+
   $(this.searchFieldInputEl).focus(_.bind(this._updateSuggestions, this));
-  $(this.searchFieldInputEl).blur(_.bind(this._hideSuggestions, this));
+  // $(this.searchFieldInputEl).blur(_.bind(this._hideSuggestions, this));
 
-  $(this.el).click(_.bind(this._hideSuggestions, this));
-
+  // $(this.el).click(_.bind(this._hideSuggestions, this));
   this.$el.on('click', '.search-field-suggestion', _.bind(this._addFilter, this));
-
-  // this.$el.on('click', '.toggle-preview', _.bind(this.togglePreview, this));
 };
 
 
 SearchbarView.Prototype = function() {
 
-  // Session Event handlers
+  // Event handlers
   // --------
   //
 
-  // this.startSearch = function(e) {
-  //   e.preventDefault();
-  //   var searchstr = $(this.searchFieldEl).val();
-  //   if (searchstr) {
-  //     this.controller.switchState({
-  //       id: "main",
-  //       searchstr: searchstr
-  //     });
-  //   }
-  // };
+  this._interpretKey = function(e) {
+    var searchStr = $(e.currentTarget).val();
+    if (e.keyCode === 8 && searchStr === "") {
+      this.controller.removeLastFilter();
+      this.renderFilters();
+    } else {
+      if (e.keyCode === 40) {
+        // arrow down
+        console.log('arrow down');
+        this.nextSuggestion();
+        e.preventDefault();
+      } else if (e.keyCode === 38) {
+        // arrow up
+        console.log('arrow up');
+        this.prevSuggestion();
+        e.preventDefault();
+      } else if (e.keyCode === 13) {
+        console.log('choose suggestion');
+        this.chooseSuggestion();
+      }
+
+    }
+  };
 
   this._updateSuggestions = function(e) {
     var searchStr = $(e.currentTarget).val();
-    // console.log('YO key up', value);
+
+    // ignore keyup/down/enter
+    if (_.include([40, 38, 13],e.keyCode)) return;
+
+    console.log('rerendering suggestions...');
     this.renderSuggestions(searchStr);
+  };
+
+  this.getSearchData = function() {
+    return {
+      searchStr: $(this.searchFieldInputEl).val(),
+      subjects: [] // soon
+    }
   };
 
   // Delay a bit so click handlers can be triggered on suggested elements
   this._hideSuggestions = function(e) {
-    // var el = this.searchFieldSuggestionsEl;
-    // _.delay(function() {
-    //   $(el).hide();
-    // }, 200, this);
+    var el = this.searchFieldSuggestionsEl;
+    // $(el).hide();
+
+    _.delay(function() {
+      $(el).hide();
+    }, 200, this);
   };
 
   this._addFilter = function(e) {
     var $el = $(e.currentTarget);
     var facet = $el.attr('data-facet');
     var value = $el.attr('data-value');
-    console.log('adding filter', facet, value);
+    // console.log('adding filter', facet, value);
+    this.controller.addFilter(facet, value);
+    this.renderFilters();
+    this._hideSuggestions();
+    // reset searchfield
+    $(this.searchFieldInputEl).val('').focus();
     e.preventDefault();
+    this.trigger('search:changed');
   };
 
+
+  this.chooseSuggestion = function() {
+    // when enter has been pressed
+    var $activeSuggestion = this.$('.search-field-suggestion.active');
+
+    if ($activeSuggestion.length > 0) {
+      $activeSuggestion.trigger('click');
+    } else {
+      console.log('starting search');
+      this.trigger('search:changed');
+      this._hideSuggestions();
+    }
+  };
 
   // Rendering
   // ==========================================================================
   //
 
   this.render = function() {
-    // this.el.innerHTML = "";
-    // this.el.appendChild(this.searchbarEl);  
-    // this.el.appendChild(this.panelWrapperEl);
-
     this.renderFilters();
     this.renderSuggestions();
     return this;
@@ -114,6 +155,39 @@ SearchbarView.Prototype = function() {
       var filterEl = $$('.search-field-filter', {text: filter.value});
       this.searchFieldFilters.appendChild(filterEl);
     }, this);
+  };
+
+  // TODO: find simpler implementation
+
+  this.prevSuggestion = function() {
+    var suggestionEls = this.searchFieldSuggestionsEl.childNodes;
+
+    if (suggestionEls.length > 0) {
+      var $activeEl = this.$('.search-field-suggestion.active');
+      if ($activeEl.length === 0) {
+        // select last element
+        $(_.last(suggestionEls)).addClass('active');
+      } else {
+        $activeEl.removeClass('active');
+        $activeEl.prev().addClass('active');
+      }
+    }
+  };
+
+  // 
+  this.nextSuggestion = function() {
+    var suggestionEls = this.searchFieldSuggestionsEl.childNodes;
+
+    if (suggestionEls.length > 0) {
+      var $activeEl = this.$('.search-field-suggestion.active');
+      if ($activeEl.length === 0) {
+        // select first element
+        $(suggestionEls[0]).addClass('active');
+      } else {
+        $activeEl.removeClass('active');
+        $activeEl.next().addClass('active');
+      }
+    }
   };
 
   // Render suggestions

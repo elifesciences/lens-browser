@@ -176,7 +176,7 @@ a:hover {
   margin-left: 20px;
   margin-top: 15px;
   height: 30px;
-  width: 70%;
+  width: 90%;
   padding: 0 5px;
   font-size: 13px;
   background: #fff;
@@ -228,10 +228,11 @@ a:hover {
 .search-field-suggestion {
   color: #444;
   padding: 5px 5px;
+  font-size: 14px;
   display: block;
 }
 
-.search-field-suggestion:hover {
+.search-field-suggestion:hover, .search-field-suggestion.active {
   color: #444;
   background: #eee;
 }
