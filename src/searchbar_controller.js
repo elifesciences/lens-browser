@@ -55,8 +55,6 @@ var SearchbarController = function(app, config) {
   this.config = config;
 
   this.filters = [
-    {facet: "subjects", value: "Biochemistry"},
-    {facet: "authors", value: "Michael Aufreiter"}
   ];
 
   this.createView();
