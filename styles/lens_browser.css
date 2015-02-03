@@ -373,13 +373,16 @@ a:hover {
 
 #facets .facet .facet-values .value {
   display: block;
-  margin-right: 20px;
-  padding: 2px 5px;
+  /*margin-right: 20px;*/
+  padding: 4px 5px;
+  font-size: 13px;
+  color: #444;
 }
 
 #facets .facet .facet-values .value.selected {
   background: #444;
   color: white;
+  border-radius: 2px;
 }
 
 /* article type */
