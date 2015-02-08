@@ -5,6 +5,9 @@ var util = require("substance-util");
 var Controller = require("substance-application").Controller;
 var SearchbarView = require("./searchbar_view");
 
+
+
+
 // Static fixture for suggested filters
 // -------------------------
 

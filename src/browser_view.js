@@ -45,7 +45,7 @@ var BrowserView = function(controller) {
   $(this.searchButton).click(_.bind(this.startSearch, this));
   $(this.searchFieldEl).change(_.bind(this.startSearch, this));
   this.$el.on('click', '.value', _.bind(this.toggleFilter, this));
-  this.$el.on('click', '.toggle-preview', _.bind(this.togglePreview, this));
+  this.$el.on('click', '.title a', _.bind(this.togglePreview, this));
 
   // Should this work on the controller?
   this.searchbarView.on('search:changed', _.bind(this.startSearch, this));
@@ -74,7 +74,7 @@ BrowserView.Prototype = function() {
   this.togglePreview = function(e) {
     e.preventDefault();
 
-    var documentId = $(e.currentTarget).parent().attr('data-id');
+    var documentId = $(e.currentTarget).parent().parent().attr('data-id');
     var filters = this.controller.searchResult.filters;
 
     // Update state
@@ -84,11 +84,6 @@ BrowserView.Prototype = function() {
       documentId: documentId,
       filters: JSON.stringify(filters)
     });
-
-    // var searchStr = this.controller.state.searchstr;
-    // this.controller.loadPreview(documentId, function(err, preview) {
-    //   console.log('preview', preview);
-    // });
   };
 
   this.toggleFilter = function(e) {
@@ -135,7 +130,10 @@ BrowserView.Prototype = function() {
   this.afterTransition = function(oldState, newState) {
     console.log('after transition');
     if (newState.id === "main") {
-      $(this.searchFieldEl).attr({value: newState.searchstr});
+      console.log('searchstr', newState.searchstr);
+
+      // TODO: replace with this.searchbarView.setData() or similar to also reflect selected filters
+      $(this.searchbarView.searchFieldInputEl).val(newState.searchstr);
 
       if (newState.searchstr) {
         this.renderSearchResult();
@@ -215,16 +213,16 @@ BrowserView.Prototype = function() {
       var documentEl = $$('.document', {
         "data-id": doc.id,
         children: [
-          $$('a.toggle-preview', {href: '#', html: '<i class="fa fa-eye"></i> Preview'}),
+          // $$('a.toggle-preview', {href: '#', html: '<i class="fa fa-eye"></i> Preview'}),
+          $$('.published-on', {text: new Date(doc.published_on).toDateString() }),
           $$('.title', {
             children: [$$('a', {href: '#', html: doc.title})]
           }),
           $$('.authors', {
             children: authors
           }),
-          $$('.intro', {text: doc.intro}),
-          categoriesEl,
-          $$('.published-on', {text: new Date(doc.published_on).toDateString() })
+          // $$('.intro', {text: doc.intro}),
+          categoriesEl
         ]
       });
 
@@ -293,13 +291,62 @@ BrowserView.Prototype = function() {
 
     var previewData = this.controller.previewData;
     if (!previewData) return;
-    console.log('rendering previewData', previewData);
+
+    // Details container
+    var detailsEl = $$('.details');
+
+    var publishDateEl = $$('.published-on', {
+      html: new Date(previewData.document.published_on).toDateString()
+    });
+
+    detailsEl.appendChild(publishDateEl);
+
+    //   $$('.title', {
+    //   children: [$$('a', {href: '#', html: doc.title})]
+    // }),
+    var titleEl = $$('.title', {
+      // href: "http://lens.elifesciences.org/03568/",
+      html: previewData.document.title,
+      // target: '_blank'
+      // children: [
+      //   $$('a', {
+      //   })
+      // ]
+    });
+
+    detailsEl.appendChild(titleEl);
+    var authorsEl = $$('.authors', {html: previewData.document.authors.join(', ') });
+    detailsEl.appendChild(authorsEl);
+
+    var linksEl = $$('.links', {
+      children: [
+        $$('a', {href: "http://lens.elifesciences.org/03568/", html: '<i class="fa fa-eye"></i> Open in Lens', target: '_blank'}),
+        $$('a', {href: "http://lens.elifesciences.org/03568/", html: '<i class="fa fa-file-pdf-o"></i> PDF', target: '_blank'})
+      ]
+    });
+
+    detailsEl.appendChild(linksEl);
+    this.previewEl.appendChild(detailsEl);
+  
+    var fragmentsEl = $$('.fragments');
+
+    var fragmentsIntroEl = $$('.intro', {html: '10 matches for "mice"'});
+    fragmentsEl.appendChild(fragmentsIntroEl);
 
     _.each(previewData.fragments, function(fragment) {
-      this.previewEl.appendChild($$('.fragment', {
-        html: fragment.content
+      fragmentsEl.appendChild($$('.fragment', {
+        children: [
+          $$('.content', {html: fragment.content}),
+          $$('.links', {
+            children: [
+              $$('a', {href: "http://lens.elifesciences.org/03568/", html: '<i class="fa fa-external-link-square"></i> Read more', target: '_blank'})
+            ]
+          })
+        ]
       }));
     }, this);
+
+    this.previewEl.appendChild(fragmentsEl);
   };
 
   this.render = function() {

@@ -136,7 +136,7 @@ a:hover {
 
 #documents {
   float: left;
-  width: 50%;
+  width: 45%;
   height: 100%;
   border-right: 1px solid #ddd;
 }
@@ -149,16 +149,63 @@ a:hover {
 #preview {
   background: #fff;
   float: right;
-  width: 30%;
+  width: 35%;
   height: 100%;
   overflow: auto;
-  font-size: 12px;
+  font-size: 14px;
   padding: 20px;
   line-height: 20px;
 }
 
+
+
 #preview .fragment {
   padding-bottom: 20px;
+}
+
+#preview .published-on {
+  color: #888;
+  padding-bottom: 5px;
+}
+
+#preview .title {
+  color: rgba(0,0,0,0.8);
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 25px;
+  padding-bottom: 10px;
+}
+
+#preview .authors {
+  padding-bottom: 10px;
+}
+
+#preview .details {
+  font-size: 16px;
+}
+
+#preview .details .links {
+  padding-bottom: 20px;
+}
+
+#preview .details .links a {
+  margin-right: 20px;
+}
+
+/* Fragments container */
+
+#preview .fragments {
+
+}
+
+#preview .fragments .intro {
+  color: #888;
+  font-size: 16px;
+  padding: 20px 0px;
+}
+
+#preview .fragment .links {
+  padding-top: 10px;
 }
 
 
@@ -266,17 +313,30 @@ a:hover {
 #documents .document {
   padding: 20px;
   position: relative;
-  border-bottom: 1px solid #ddd;
+  /*border-bottom: 1px solid #ddd;*/
 }
 
-
+#documents .document .published-on {
+  color: #888;
+  padding-bottom: 5px;
+}
 
 #documents .document .title {
   display: block;
-  margin-right: 130px;
+  
+  /*margin-right: 130px;*/
   font-size: 20px;
   line-height: 26px;
-  padding-bottom: 10px;
+  padding-bottom: 5px;
+}
+
+#documents .document .title a {
+  font-weight: 600;
+}
+
+#documents .document .authors {
+  font-size: 16px;
+  line-height: 20px;
 }
 
 #documents .document .authors .author {
@@ -323,7 +383,8 @@ a:hover {
 }
 
 .query-string {
-  background: #ccc;
+  font-weight: bold;
+  /*background: rgba(234, 231, 35, 0.16);*/
 }
 
 #documents .document .categories .article_type {
@@ -331,7 +392,7 @@ a:hover {
 }
 
 #documents .document .toggle-preview {
-  display: block;
+  display: none;
   color: rgba(11, 157, 217, 1);
   position: absolute;
   padding: 20px;
@@ -345,14 +406,20 @@ a:hover {
   z-index: 5000;
 }
 
-#documents .document:hover .toggle-preview {
+#documents .document.active .title a {
+  color: #1B6685;
+  background: rgba(11, 157, 217, 0.6);
+  border-bottom: 1px solid rgba(11, 157, 217, 0.4);
+}
+
+/*#documents .document:hover .toggle-preview {
   border-right: 3px solid rgba(0, 0, 0, 0.1);
 }
 
 #documents .document.active .toggle-preview {
   border-right: 3px solid rgba(11, 157, 217, 1);
 }
-
+*/
 /* Facets panel
 ---------------------------------
 */
@@ -375,6 +442,7 @@ a:hover {
 #facets .facet .facet-values .value {
   display: block;
   /*margin-right: 20px;*/
+  margin-bottom: 1px;
   padding: 4px 5px;
   font-size: 13px;
   color: #444;
