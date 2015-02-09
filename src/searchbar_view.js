@@ -4,6 +4,11 @@ var _ = require("underscore");
 var View = require("substance-application").View;
 var $$ = require("substance-application").$$;
 
+var ICON_MAPPING = {
+  "subjects": "fa-tags",
+  "article_type": "fa-align-left"
+};
+
 // SearchbarView Constructor
 // ========
 //
@@ -160,7 +165,10 @@ SearchbarView.Prototype = function() {
 
     this.searchFieldFilters.innerHTML = "";
     _.each(filters, function(filter) {
-      var filterEl = $$('.search-field-filter', {text: filter.value});
+      var filterEl = $$('.search-field-filter', {
+        html: '<i class="fa '+ICON_MAPPING[filter.facet]+'"></i> '+ filter.value
+      });
+
       this.searchFieldFilters.appendChild(filterEl);
     }, this);
   };
@@ -182,7 +190,6 @@ SearchbarView.Prototype = function() {
     }
   };
 
-  // 
   this.nextSuggestion = function() {
     var suggestionEls = this.searchFieldSuggestionsEl.childNodes;
 
@@ -206,7 +213,7 @@ SearchbarView.Prototype = function() {
     this.searchFieldSuggestionsEl.innerHTML = "";
     _.each(suggestions, function(suggestion) {
       var suggestionEl = $$('a.search-field-suggestion', {
-        html: suggestion.value,
+        html: '<i class="fa '+ICON_MAPPING[suggestion.facet]+'"></i> '+ suggestion.value,
         href: "#",
         "data-value": suggestion.rawValue,
         "data-facet": suggestion.facet

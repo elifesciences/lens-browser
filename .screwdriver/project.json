@@ -32,9 +32,9 @@
     }
   },
   "styles": {
-    "styles/lens_browser.css":  "styles/lens_browser.css"
   },
   "assets": {
+    "styles": "styles",
     "lib/jquery-2.0.3.min.js": "lib/jquery-2.0.3.min.js",
     "lib/jquery-2.0.3.min.map": "lib/jquery-2.0.3.min.map"
   },

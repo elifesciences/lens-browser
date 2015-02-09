@@ -115,12 +115,12 @@ SearchbarController.Prototype = function() {
   // Get currently selected filters
   // ----------------------
 
-  this.getSuggestions = function(searchStr) {
+  this.getSuggestions = function(searchStr) {
     var suggestions = [];
 
     if (!searchStr) return [];
 
-    _.each(AVAILABLE_FACETS, function(facet, facetKey) {
+    _.each(AVAILABLE_FACETS, function(facet, facetKey) {
       _.each(facet.entries, function(entry) {
         if (entry.toLowerCase().match(searchStr.toLowerCase())) {
           suggestions.push({

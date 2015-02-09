@@ -52,13 +52,13 @@ BrowserController.Prototype = function() {
     //   if (skip) return cb(null, {skip: true});
     // }
 
-    if (newState.id === "main") {
+    if (newState.id === "main") {
 
       // Handle edge case: no searchstr provided
       // TODO: load a set of featured articles
       // if (!newState.searchstr) return cb(null);
       
-      if (newState.searchstr !== this.state.searchstr || newState.searchFilters !== this.state.searchFilters) {
+      if (newState.searchstr !== this.state.searchstr || newState.searchFilters !== this.state.searchFilters) {
         // Search result has changed
         this.loadSearchResult(newState, cb);
       } else if (newState.filters !== this.state.filters) {
