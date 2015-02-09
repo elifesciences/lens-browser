@@ -49,7 +49,6 @@ var SearchbarView = function(controller) {
   this.$el.on('click', '.search-field-suggestion', _.bind(this._addFilter, this));
 };
 
-
 SearchbarView.Prototype = function() {
 
   // Event handlers
@@ -60,6 +59,7 @@ SearchbarView.Prototype = function() {
     var searchStr = $(e.currentTarget).val();
     if (e.keyCode === 8 && searchStr === "") {
       this.controller.removeLastFilter();
+      this.trigger('search:changed');
       this.renderFilters();
     } else {
       if (e.keyCode === 40) {
@@ -76,24 +76,33 @@ SearchbarView.Prototype = function() {
         console.log('choose suggestion');
         this.chooseSuggestion();
       }
-
     }
   };
 
   this._updateSuggestions = function(e) {
     var searchStr = $(e.currentTarget).val();
 
-    // ignore keyup/down/enter
+    // ignore keyup/keydown/enter
     if (_.include([40, 38, 13],e.keyCode)) return;
 
     console.log('rerendering suggestions...');
     this.renderSuggestions(searchStr);
   };
 
+  this.setSearchData = function(data) {
+    this.controller.searchstr = data.searchstr;
+    if (data.searchFilters) {
+      this.controller.filters = data.searchFilters;
+      this.renderFilters();
+    }
+
+    $(this.searchFieldInputEl).val(this.controller.searchstr);
+  }
+
   this.getSearchData = function() {
     return {
       searchStr: $(this.searchFieldInputEl).val(),
-      subjects: [] // soon
+      filters: this.controller.getFilters()
     }
   };
 
@@ -111,7 +120,7 @@ SearchbarView.Prototype = function() {
     var $el = $(e.currentTarget);
     var facet = $el.attr('data-facet');
     var value = $el.attr('data-value');
-    // console.log('adding filter', facet, value);
+
     this.controller.addFilter(facet, value);
     this.renderFilters();
     this._hideSuggestions();
@@ -121,7 +130,6 @@ SearchbarView.Prototype = function() {
     this.trigger('search:changed');
   };
 
-
   this.chooseSuggestion = function() {
     // when enter has been pressed
     var $activeSuggestion = this.$('.search-field-suggestion.active');
@@ -129,7 +137,6 @@ SearchbarView.Prototype = function() {
     if ($activeSuggestion.length > 0) {
       $activeSuggestion.trigger('click');
     } else {
-      console.log('starting search');
       this.trigger('search:changed');
       this._hideSuggestions();
     }
@@ -150,6 +157,7 @@ SearchbarView.Prototype = function() {
 
   this.renderFilters = function() {
     var filters = this.controller.getFilters();
+
     this.searchFieldFilters.innerHTML = "";
     _.each(filters, function(filter) {
       var filterEl = $$('.search-field-filter', {text: filter.value});

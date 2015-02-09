@@ -5,9 +5,6 @@ var util = require("substance-util");
 var Controller = require("substance-application").Controller;
 var SearchbarView = require("./searchbar_view");
 
-
-
-
 // Static fixture for suggested filters
 // -------------------------
 
@@ -102,6 +99,17 @@ SearchbarController.Prototype = function() {
 
   this.getFilters = function() {
     return this.filters;
+  };
+
+  this.getSerializedFilters = function() {
+    var filters = {};
+    _.each(this.getFilters(), function(filter) {
+      if (!filters[filter.facet]) {
+        filters[filter.facet] = [];
+      }
+      filters[filter.facet] = filter.value;
+    });
+    return filters;
   };
 
   // Get currently selected filters

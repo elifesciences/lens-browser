@@ -4,7 +4,6 @@ var _ = require("underscore");
 var View = require("substance-application").View;
 var $$ = require("substance-application").$$;
 
-
 // Browser.View Constructor
 // ========
 //
@@ -60,15 +59,21 @@ BrowserView.Prototype = function() {
   // TODO: consider global filters (subject selection etc.)
 
   this.startSearch = function(e) {
+    console.log('starting search...');
+
     var searchData = this.searchbarView.getSearchData();
     console.log('le searchdata', searchData);
+    var searchFilters = JSON.stringify(searchData.filters);
+    console.log('le searchFilters', searchFilters);
 
-    if (searchData.searchStr) {
-      this.controller.switchState({
-        id: "main",
-        searchstr: searchData.searchStr
-      });
-    }
+
+    // if (searchData.searchStr) {
+    this.controller.switchState({
+      id: "main",
+      searchstr: searchData.searchStr,
+      searchFilters: searchFilters
+    });
+    // }
   };
 
   this.togglePreview = function(e) {
@@ -76,13 +81,15 @@ BrowserView.Prototype = function() {
 
     var documentId = $(e.currentTarget).parent().parent().attr('data-id');
     var filters = this.controller.searchResult.filters;
+    var searchFilters = this.controller.searchResult.searchFilters;
 
     // Update state
     this.controller.switchState({
       id: "main",
       searchstr: this.controller.state.searchstr,
       documentId: documentId,
-      filters: JSON.stringify(filters)
+      filters: JSON.stringify(filters),
+      searchFilters: JSON.stringify(searchFilters)
     });
   };
 
@@ -116,7 +123,8 @@ BrowserView.Prototype = function() {
     this.controller.switchState({
       id: "main",
       searchstr: this.controller.state.searchstr,
-      filters: JSON.stringify(filters)
+      filters: JSON.stringify(filters),
+      searchFilters: this.controller.state.searchFilters
     });
   };
 
@@ -132,21 +140,29 @@ BrowserView.Prototype = function() {
     if (newState.id === "main") {
       console.log('searchstr', newState.searchstr);
 
-      // TODO: replace with this.searchbarView.setData() or similar to also reflect selected filters
-      $(this.searchbarView.searchFieldInputEl).val(newState.searchstr);
+      // Prepare search data for searchbar view
+      var searchData = {
+        searchstr: newState.searchstr
+      };
 
-      if (newState.searchstr) {
-        this.renderSearchResult();
+      if (newState.searchFilters) {
+        searchData.searchFilters = JSON.parse(newState.searchFilters);
+      }
+      this.searchbarView.setSearchData(searchData);
+
+      // if (newState.searchstr) {
+      this.renderSearchResult();
+
         // if the search has not changed then 'likely' the filter has
         // TODO: could be detected more explicitly
         // if (oldState.searchstr === newState.searchstr) {
         //   console.log('filters have been changed...');
         //   this.renderSearchResult();
         // }
-      } else {
-        // TODO: render 'moderated' list of documents
-        alert('no search string specified');
-      }
+      // } else {
+      //   // TODO: render 'moderated' list of documents
+      //   alert('no search string specified');
+      // }
     }
   };
 
