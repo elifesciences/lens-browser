@@ -67,7 +67,7 @@ BrowserController.Prototype = function() {
       } else if (newState.documentId && newState.documentId !== this.state.documentId) {
         // Selected document has been changed
         console.log('loading preview...');
-        this.loadPreview(newState, cb);
+        this.loadPreview(newState.documentId, newState.searchstr, cb);
       } else {
         console.log('no state change detected, skipping', this.state, newState);
         // cb(null);
@@ -141,11 +141,11 @@ BrowserController.Prototype = function() {
   // -----------------------
   // 
 
-  this.loadPreview = function(newState, cb) {
+  this.loadPreview = function(documentId, searchStr, cb) {
     // Get filters from app state
-    var searchStr = newState.searchstr;
-    var documentId = newState.documentId;
-    var filters = this.getFilters(newState);
+    // var searchStr = newState.searchstr;
+    // var documentId = newState.documentId;
+    // var filters = this.getFilters(newState);
     var self = this;
 
     // self.previewData = EXAMPLE_PREVIEW_DATA;
@@ -204,15 +204,20 @@ BrowserController.Prototype = function() {
     $.ajax({
       url: this.config.api_url+"/search?searchString="+encodeURIComponent(searchStr)+"&"+encodedSearchFilters,
       dataType: 'json',
-      success: function(data) {
+      success: function(matchingDocs) {
         // TODO: this structure should be provided on the server
         self.searchResult = new SearchResult({
           query: newState.searchstr,
-          documents: data
+          documents: matchingDocs
         }, filters);
 
+        // Preview first document by default
+        if (!documentId && matchingDocs.length > 0) {
+          documentId = matchingDocs[0].id;
+        }
+
         if (documentId) {
-          self.loadPreview(newState, cb);
+          self.loadPreview(documentId, newState.searchstr, cb);  
         } else {
           self.previewData = null;
           cb(null);

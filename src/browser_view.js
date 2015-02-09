@@ -60,12 +60,8 @@ BrowserView.Prototype = function() {
 
   this.startSearch = function(e) {
     console.log('starting search...');
-
     var searchData = this.searchbarView.getSearchData();
-    console.log('le searchdata', searchData);
     var searchFilters = JSON.stringify(searchData.filters);
-    console.log('le searchFilters', searchFilters);
-
 
     // if (searchData.searchStr) {
     this.controller.switchState({
@@ -80,16 +76,14 @@ BrowserView.Prototype = function() {
     e.preventDefault();
 
     var documentId = $(e.currentTarget).parent().parent().attr('data-id');
-    var filters = this.controller.searchResult.filters;
-    var searchFilters = this.controller.searchResult.searchFilters;
 
     // Update state
     this.controller.switchState({
       id: "main",
       searchstr: this.controller.state.searchstr,
       documentId: documentId,
-      filters: JSON.stringify(filters),
-      searchFilters: JSON.stringify(searchFilters)
+      filters: this.controller.state.filters,
+      searchFilters: this.controller.state.searchFilters
     });
   };
 
@@ -134,6 +128,8 @@ BrowserView.Prototype = function() {
 
   // After state transition
   // --------------
+  // 
+  // TODO: optimize! (currently we re-render everything)
 
   this.afterTransition = function(oldState, newState) {
     console.log('after transition');
@@ -205,7 +201,7 @@ BrowserView.Prototype = function() {
     // Get filtered documents
     var documents = this.controller.searchResult.getDocuments();
 
-    _.each(documents, function(doc) {
+    _.each(documents, function(doc, index) {
       var authors = [];
 
       _.each(doc.authors, function(author) {
@@ -243,6 +239,9 @@ BrowserView.Prototype = function() {
       });
 
       if (documentId === doc.id) {
+        documentEl.classList.add("active");
+      } else if (!documentId && index === 0) {
+        // Highlight first result by default
         documentEl.classList.add("active");
       }
 
@@ -345,8 +344,8 @@ BrowserView.Prototype = function() {
     this.previewEl.appendChild(detailsEl);
   
     var fragmentsEl = $$('.fragments');
-
-    var fragmentsIntroEl = $$('.intro', {html: '10 matches for "mice"'});
+    var fragmentsIntroEl = $$('.intro', {html: previewData.fragments.length+' matches for "'+this.controller.state.searchstr+'"'});
+    
     fragmentsEl.appendChild(fragmentsIntroEl);
 
     _.each(previewData.fragments, function(fragment) {
