@@ -25,18 +25,20 @@ var BrowserView = function(controller) {
   // List of found documents
   // ------------
   // 
-  // Left floated 60%
 
   this.facetsEl = $$('#facets');
   this.documentsEl = $$('#documents');
   this.previewEl = $$('#preview');
 
+  // Loading indicator
+  this.loadingEl = $$('.loading', {html: '<div class="spinner-wrapper"><div class="spinner"></div><div class="message">Loading documents</div></div>'});
+
   // Wrap what we have into a panel wrapper
   this.panelWrapperEl = $$('.panel-wrapper');
-
   this.panelWrapperEl.appendChild(this.facetsEl);
   this.panelWrapperEl.appendChild(this.documentsEl);
   this.panelWrapperEl.appendChild(this.previewEl);
+  this.panelWrapperEl.appendChild(this.loadingEl);
 
   // Event handlers
   // ------------
@@ -50,26 +52,31 @@ var BrowserView = function(controller) {
   this.searchbarView.on('search:changed', _.bind(this.startSearch, this));
 };
 
-
 BrowserView.Prototype = function() {
 
   // Session Event handlers
   // --------
   //
-  // TODO: consider global filters (subject selection etc.)
 
   this.startSearch = function(e) {
-    console.log('starting search...');
     var searchData = this.searchbarView.getSearchData();
-    var searchFilters = JSON.stringify(searchData.filters);
+    var searchFilters = searchData.filters;
 
-    // if (searchData.searchStr) {
     this.controller.switchState({
       id: "main",
       searchstr: searchData.searchStr,
       searchFilters: searchFilters
     });
-    // }
+  };
+
+  // Show the loading indicator
+  this.showLoading = function() {
+    $(this.loadingEl).show();
+  };
+
+  // Hide the loading indicator
+  this.hideLoading = function() {
+    $(this.loadingEl).hide();
   };
 
   this.togglePreview = function(e) {
@@ -82,11 +89,13 @@ BrowserView.Prototype = function() {
       id: "main",
       searchstr: this.controller.state.searchstr,
       documentId: documentId,
-      filters: this.controller.state.filters,
-      searchFilters: this.controller.state.searchFilters
+      filters: this.controller.state.filters || "",
+      searchFilters: this.controller.state.searchFilters || ""
     });
   };
 
+  // Toggle a filter
+  // ---------------
   this.toggleFilter = function(e) {
     e.preventDefault();
 
@@ -96,7 +105,8 @@ BrowserView.Prototype = function() {
     // TODO: this preparing of new filter state is quite hacky.
     // We need to find a better way
 
-    var filters = this.controller.searchResult.filters;
+    // Make deep copy, so we don't mess up with the oldState
+    var filters = JSON.parse(JSON.stringify(this.controller.searchResult.filters));
 
     // Implicitly remove a filter if already set
     if ($(e.currentTarget).hasClass('selected')) {
@@ -116,9 +126,9 @@ BrowserView.Prototype = function() {
     // Update state
     this.controller.switchState({
       id: "main",
-      searchstr: this.controller.state.searchstr,
-      filters: JSON.stringify(filters),
-      searchFilters: this.controller.state.searchFilters
+      searchstr: this.controller.state.searchstr || "",
+      filters: filters || {},
+      searchFilters: this.controller.state.searchFilters || []
     });
   };
 
@@ -134,17 +144,14 @@ BrowserView.Prototype = function() {
   this.afterTransition = function(oldState, newState) {
     console.log('after transition');
     if (newState.id === "main") {
-      console.log('searchstr', newState.searchstr);
+      // console.log('searchstr', newState.searchstr);
 
       // Prepare search data for searchbar view
-      var searchData = {
-        searchstr: newState.searchstr
-      };
-
-      if (newState.searchFilters) {
-        searchData.searchFilters = JSON.parse(newState.searchFilters);
-      }
-      this.searchbarView.setSearchData(searchData);
+      this.searchbarView.setSearchData({
+        searchstr: newState.searchstr,
+        // It's important that we pass a clone here, so the searchbar doesn't mess with the state variable object
+        searchFilters: newState.searchFilters ? JSON.parse(JSON.stringify(newState.searchFilters)) : []
+      });
 
       // if (newState.searchstr) {
       this.renderSearchResult();
@@ -191,9 +198,11 @@ BrowserView.Prototype = function() {
   this.renderSearchResult = function() {
     this.documentsEl.innerHTML = "";
 
+    // Hide loading indicator
+    this.hideLoading();
+
     // highlight previewed document
     var documentId = this.controller.state.documentId;
-    // console.log('meh', this.$('.document[data-id='+documentId+']'));
 
     // Clear element index
     this.clearElementRegistry();
@@ -201,52 +210,58 @@ BrowserView.Prototype = function() {
     // Get filtered documents
     var documents = this.controller.searchResult.getDocuments();
 
-    _.each(documents, function(doc, index) {
-      var authors = [];
 
-      _.each(doc.authors, function(author) {
-        var authorEl = $$('span.author.facet-occurence', {text: author});
-        this.registerElement("authors", author, authorEl);
-        authors.push(authorEl);
+    if (documents.length > 0) {
+      _.each(documents, function(doc, index) {
+        var authors = [];
+
+        _.each(doc.authors, function(author) {
+          var authorEl = $$('span.author.facet-occurence', {text: author});
+          this.registerElement("authors", author, authorEl);
+          authors.push(authorEl);
+        }, this);
+
+        var categoriesEl = $$('.categories');
+        var articleTypeEl = $$('.article_type.facet-occurence', {text: doc.article_type });
+        categoriesEl.appendChild(articleTypeEl);
+        this.registerElement("article_type", doc.article_type, articleTypeEl);
+
+        // Iterate over subjects and display
+        _.each(doc.subjects, function(subject) {
+          var subjectEl = $$('.subjects.facet-occurence', {text: subject});
+          categoriesEl.appendChild(subjectEl);
+          this.registerElement("subjects", subject, subjectEl);
+        }, this);
+
+        var documentEl = $$('.document', {
+          "data-id": doc.id,
+          children: [
+            // $$('a.toggle-preview', {href: '#', html: '<i class="fa fa-eye"></i> Preview'}),
+            $$('.published-on', {text: new Date(doc.published_on).toDateString() }),
+            $$('.title', {
+              children: [$$('a', {href: '#', html: doc.title})]
+            }),
+            $$('.authors', {
+              children: authors
+            }),
+            // $$('.intro', {text: doc.intro}),
+            categoriesEl
+          ]
+        });
+
+        if (documentId === doc.id) {
+          documentEl.classList.add("active");
+        } else if (!documentId && index === 0) {
+          // Highlight first result by default
+          documentEl.classList.add("active");
+        }
+
+        this.documentsEl.appendChild(documentEl);
       }, this);
-
-      var categoriesEl = $$('.categories');
-      var articleTypeEl = $$('.article_type.facet-occurence', {text: doc.article_type });
-      categoriesEl.appendChild(articleTypeEl);
-      this.registerElement("article_type", doc.article_type, articleTypeEl);
-
-      // Iterate over subjects and display
-      _.each(doc.subjects, function(subject) {
-        var subjectEl = $$('.subjects.facet-occurence', {text: subject});
-        categoriesEl.appendChild(subjectEl);
-        this.registerElement("subjects", subject, subjectEl);
-      }, this);
-
-      var documentEl = $$('.document', {
-        "data-id": doc.id,
-        children: [
-          // $$('a.toggle-preview', {href: '#', html: '<i class="fa fa-eye"></i> Preview'}),
-          $$('.published-on', {text: new Date(doc.published_on).toDateString() }),
-          $$('.title', {
-            children: [$$('a', {href: '#', html: doc.title})]
-          }),
-          $$('.authors', {
-            children: authors
-          }),
-          // $$('.intro', {text: doc.intro}),
-          categoriesEl
-        ]
-      });
-
-      if (documentId === doc.id) {
-        documentEl.classList.add("active");
-      } else if (!documentId && index === 0) {
-        // Highlight first result by default
-        documentEl.classList.add("active");
-      }
-
-      this.documentsEl.appendChild(documentEl);
-    }, this);
+    } else {
+      // Render no search result
+      this.documentsEl.appendChild($$('.no-result', {text: "Your search did not match any documents"}));
+    }
   
     this.renderFacets();
     this.renderPreview();
@@ -316,17 +331,10 @@ BrowserView.Prototype = function() {
 
     detailsEl.appendChild(publishDateEl);
 
-    //   $$('.title', {
-    //   children: [$$('a', {href: '#', html: doc.title})]
-    // }),
+    var documentId = this.controller.state.documentId;
+
     var titleEl = $$('.title', {
-      // href: "http://lens.elifesciences.org/03568/",
-      html: previewData.document.title,
-      // target: '_blank'
-      // children: [
-      //   $$('a', {
-      //   })
-      // ]
+      html: previewData.document.title
     });
 
     detailsEl.appendChild(titleEl);
@@ -335,8 +343,8 @@ BrowserView.Prototype = function() {
 
     var linksEl = $$('.links', {
       children: [
-        $$('a', {href: "http://lens.elifesciences.org/03568/", html: '<i class="fa fa-eye"></i> Open in Lens', target: '_blank'}),
-        $$('a', {href: "http://lens.elifesciences.org/03568/", html: '<i class="fa fa-file-pdf-o"></i> PDF', target: '_blank'})
+        $$('a', {href: previewData.document.url, html: '<i class="fa fa-external-link-square"></i> Open in Lens', target: '_blank'}),
+        $$('a', {href: previewData.document.pdf_url, html: '<i class="fa fa-file-pdf-o"></i> PDF', target: '_blank'})
       ]
     });
 
@@ -344,17 +352,20 @@ BrowserView.Prototype = function() {
     this.previewEl.appendChild(detailsEl);
   
     var fragmentsEl = $$('.fragments');
-    var fragmentsIntroEl = $$('.intro', {html: previewData.fragments.length+' matches for "'+this.controller.state.searchstr+'"'});
-    
-    fragmentsEl.appendChild(fragmentsIntroEl);
+
+    if (previewData.fragments.length > 0) {
+      var fragmentsIntroEl = $$('.intro', {html: previewData.fragments.length+' matches for "'+this.controller.state.searchstr+'"'});
+      fragmentsEl.appendChild(fragmentsIntroEl);      
+    }
 
     _.each(previewData.fragments, function(fragment) {
+      console.log('frag', fragment.id);
       fragmentsEl.appendChild($$('.fragment', {
         children: [
           $$('.content', {html: fragment.content}),
           $$('.links', {
             children: [
-              $$('a', {href: "http://lens.elifesciences.org/03568/", html: '<i class="fa fa-external-link-square"></i> Read more', target: '_blank'})
+              $$('a', {href: previewData.document.url+"#content/"+fragment.id, html: '<i class="fa fa-external-link-square"></i> Read more', target: '_blank'})
             ]
           })
         ]

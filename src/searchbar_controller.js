@@ -53,10 +53,7 @@ var SearchbarController = function(app, config) {
   Controller.call(this);
 
   this.config = config;
-
-  this.filters = [
-  ];
-
+  this.filters = [];
   this.createView();
 };
 
@@ -76,9 +73,6 @@ SearchbarController.Prototype = function() {
     }
     return this.view;
   };
-
-  // this.transition = function(newState, cb) {
-  // };
 
   // Add a new search filter
   // ----------------------
@@ -137,14 +131,6 @@ SearchbarController.Prototype = function() {
     return suggestions;
   };
 
-  // Filter documents according to new filter criteria
-  // -----------------------
-  // 
-
-  // this.afterTransition = function(oldState) {
-  //   var newState = this.state;
-  //   this.view.afterTransition(oldState, newState);
-  // };
 };
 
 SearchbarController.Prototype.prototype = Controller.prototype;

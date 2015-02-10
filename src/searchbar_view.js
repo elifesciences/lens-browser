@@ -28,7 +28,7 @@ var SearchbarView = function(controller) {
   this.searchFieldFilters = $$('.search-field-filters');
   this.searchFieldEl.appendChild(this.searchFieldFilters);
 
-  this.searchFieldInputEl = $$('input.search-field-input', {type: "text"});
+  this.searchFieldInputEl = $$('input.search-field-input', {type: "text", placeholder: "Search or add filters"});
   this.searchFieldEl.appendChild(this.searchFieldInputEl);
 
   // Suggestions
@@ -90,7 +90,6 @@ SearchbarView.Prototype = function() {
     // ignore keyup/keydown/enter
     if (_.include([40, 38, 13],e.keyCode)) return;
 
-    console.log('rerendering suggestions...');
     this.renderSuggestions(searchStr);
   };
 
@@ -102,7 +101,7 @@ SearchbarView.Prototype = function() {
     }
 
     $(this.searchFieldInputEl).val(this.controller.searchstr);
-  }
+  };
 
   this.getSearchData = function() {
     return {
@@ -228,6 +227,7 @@ SearchbarView.Prototype = function() {
     this.stopListening();
   };
 };
+
 
 // Export
 // --------
