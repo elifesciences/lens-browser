@@ -51,7 +51,7 @@ BrowserController.Prototype = function() {
       // if (!newState.searchstr) return cb(null);
       // debugger;
       
-      if (this.state.id === "uninitialized" || newState.searchstr !== this.state.searchstr || !_.isEqual(newState.searchFilters, this.state.searchFilters)) {
+      if (this.state.id === "uninitialized" || newState.searchstr !== this.state.searchstr || !_.isEqual(newState.searchFilters, this.state.searchFilters)) {
         // Search result has changed after initialization
         this.loadSearchResult(newState, cb);
       } else if (!_.isEqual(newState.filters, this.state.filters)) {
@@ -97,12 +97,12 @@ BrowserController.Prototype = function() {
 
   // Get filters from new state
   this.getSearchFilters = function(newState) {
-    return newState.searchFilters || {};
+    return newState.searchFilters || {};
   };
 
   // Get filters from new state
   this.getFilters = function(newState) {
-    return newState.filters || {};
+    return newState.filters || {};
   };
 
   // Filter documents according to new filter criteria
@@ -154,7 +154,7 @@ BrowserController.Prototype = function() {
     this.view.showLoading();
 
     // Get filters from app state
-    var searchStr = newState.searchstr || "";
+    var searchStr = newState.searchstr || "";
     var documentId = newState.documentId;
     var filters = this.getFilters(newState);
     var searchFilters = this.getSearchFilters(newState);

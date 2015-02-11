@@ -89,8 +89,8 @@ BrowserView.Prototype = function() {
       id: "main",
       searchstr: this.controller.state.searchstr,
       documentId: documentId,
-      filters: this.controller.state.filters || "",
-      searchFilters: this.controller.state.searchFilters || ""
+      filters: this.controller.state.filters || "",
+      searchFilters: this.controller.state.searchFilters || ""
     });
   };
 
@@ -126,9 +126,9 @@ BrowserView.Prototype = function() {
     // Update state
     this.controller.switchState({
       id: "main",
-      searchstr: this.controller.state.searchstr || "",
-      filters: filters || {},
-      searchFilters: this.controller.state.searchFilters || []
+      searchstr: this.controller.state.searchstr || "",
+      filters: filters || {},
+      searchFilters: this.controller.state.searchFilters || []
     });
   };
 
@@ -150,7 +150,7 @@ BrowserView.Prototype = function() {
       this.searchbarView.setSearchData({
         searchstr: newState.searchstr,
         // It's important that we pass a clone here, so the searchbar doesn't mess with the state variable object
-        searchFilters: newState.searchFilters ? JSON.parse(JSON.stringify(newState.searchFilters)) : []
+        searchFilters: newState.searchFilters ? JSON.parse(JSON.stringify(newState.searchFilters)) : []
       });
 
       // if (newState.searchstr) {
@@ -359,7 +359,6 @@ BrowserView.Prototype = function() {
     }
 
     _.each(previewData.fragments, function(fragment) {
-      console.log('frag', fragment.id);
       fragmentsEl.appendChild($$('.fragment', {
         children: [
           $$('.content', {html: fragment.content}),
