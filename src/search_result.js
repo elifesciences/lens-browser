@@ -100,37 +100,7 @@ SearchResult.Prototype = function() {
     return filter.indexOf(value) >= 0;
   };
 
-  // Get available facets
-  // ------------
-  // 
-  // More verbose representation of all available facets
-  // used by the browser view
 
-  this.getAvailableFacets = function() {
-    var availableFacets = [];
-    _.each(this.facets, function(facet, key) {
-      var richValues = [];
-      var values = Object.keys(facet);
-
-      _.each(values, function(val) {
-        richValues.push({
-          frequency: facet[val].length,
-          name: val,
-          selected: this.isSelected(key, val)
-        });
-      }, this);
-
-      if (richValues.length > 1) {
-        availableFacets.push({
-          property: key,
-          name: AVAILABLE_FACETS[key],
-          values: richValues
-        });        
-      }
-
-    }, this);
-    return availableFacets;
-  };
 };
 
 SearchResult.prototype = new SearchResult.Prototype();

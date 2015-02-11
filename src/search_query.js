@@ -22,6 +22,9 @@ SearchQuery.Prototype = function() {
   this.removeFilter = function(facet, value) {
     var values = this.filters[facet];
     this.filters[facet] = _.without(values, value);
+    if (values.length === 0) {
+      delete this.filters[facet];
+    }
     this.trigger("query:changed");
   };
 

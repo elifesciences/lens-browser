@@ -8,8 +8,6 @@ var BrowserView = require("./browser_view");
 var SearchQuery = require("./search_query");
 var SearchResult = require("./search_result");
 
-
-
 // Used to initialize the SearchQuery model
 var EMPTY_QUERY = {
   searchStr: "",
@@ -138,12 +136,9 @@ BrowserController.Prototype = function() {
 
     if (newState.id === "main") {
 
-      // Handle edge case: no searchstr provided
-      // TODO: load a set of featured articles
-      // if (!newState.searchstr) return cb(null);
-      // debugger;
       if (this.state.id === "uninitialized") {
         // Set the initial search query from app state
+        // TODO: this could be done in a 
         console.log('setting initial query', newState.searchQuery);
 
         var query = newState.searchQuery;
@@ -174,44 +169,6 @@ BrowserController.Prototype = function() {
       return cb(null);
       // cb(null);
     }
-  };
-
-  // Encode search filters so they can be provided to the search API as a query string
-  this.encodeSearchFilters = function(searchFilters) {
-    var serializedFilters = {};
-    _.each(searchFilters, function(f) {
-      if (!serializedFilters[f.facet]) {
-        serializedFilters[f.facet] = []
-      }
-      serializedFilters[f.facet].push(encodeURIComponent(f.value));
-    });
-
-    var filterQuery = [];
-    _.each(serializedFilters, function(f, key) {      
-      filterQuery.push(key+"="+f.join(','));
-    });
-
-    return filterQuery.join('&');
-  };
-
-  // Get filters from new state
-  this.getSearchFilters = function(newState) {
-    return newState.searchFilters || {};
-  };
-
-  // Get filters from new state
-  this.getFilters = function(newState) {
-    return newState.filters || {};
-  };
-
-  // Filter documents according to new filter criteria
-  // -----------------------
-  // 
-
-  this.filterDocuments = function(newState, cb) {
-    var filters = this.getFilters(newState);
-    this.searchResult.applyFilters(filters);
-    cb(null);
   };
 
   // Load preview
@@ -251,15 +208,10 @@ BrowserController.Prototype = function() {
   this.loadSearchResult = function(newState, cb) {
     this.view.showLoading();
 
-    // Get filters from app state
-    var searchStr = newState.searchstr || "";
-    
+    // Get filters from app state    
     var searchQuery = newState.searchQuery;
     var documentId = newState.documentId;
-    // var filters = this.getFilters(newState);
-    // var searchFilters = this.getSearchFilters(newState);
     var self = this;
-    // var encodedSearchFilters = this.encodeSearchFilters(searchFilters);
 
     $.ajax({
       url: this.config.api_url+"/search?searchQuery="+encodeURIComponent(JSON.stringify(searchQuery)),
@@ -272,17 +224,8 @@ BrowserController.Prototype = function() {
           documents: matchingDocs
         }, {});
 
-        // Preview first document by default
-        if (!documentId && matchingDocs.length > 0) {
-          documentId = matchingDocs[0].id;
-        }
-
-        if (documentId) {
-          self.loadPreview(documentId, newState.searchstr, cb);  
-        } else {
-          self.previewData = null;
-          cb(null);
-        }
+        self.previewData = null;
+        cb(null);
       },
       error: function(err) {
         console.error(err.responseText);

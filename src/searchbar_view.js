@@ -183,23 +183,7 @@ SearchbarView.Prototype = function() {
   // Render currently chosen filters
   // ------------------
 
-  // this.renderFilters = function() {
-  //   var filters = this.controller.getFilters();
-
-  //   this.searchFieldFilters.innerHTML = "";
-  //   _.each(filters, function(filter) {
-  //     var filterEl = $$('.search-field-filter', {
-  //       html: '<i class="fa '+ICON_MAPPING[filter.facet]+'"></i> '+ filter.value
-  //     });
-
-  //     this.searchFieldFilters.appendChild(filterEl);
-  //   }, this);
-  // };
-
   this.renderFilters = function() {
-    console.log('filters', this.searchQuery.filters);
-    // var filters = this.controller.getFilters();
-
     this.searchFieldFilters.innerHTML = "";
     _.each(this.searchQuery.filters, function(filterValues, facet) {
       _.each(filterValues, function(filterVal) {
@@ -209,14 +193,6 @@ SearchbarView.Prototype = function() {
         this.searchFieldFilters.appendChild(filterEl);
       }, this);
     }, this);
-    
-    // _.each(filters, function(filter) {
-    //   var filterEl = $$('.search-field-filter', {
-    //     html: '<i class="fa '+ICON_MAPPING[filter.facet]+'"></i> '+ filter.value
-    //   });
-
-    //   this.searchFieldFilters.appendChild(filterEl);
-    // }, this);
   };
 
   // Update the current view according to new data
