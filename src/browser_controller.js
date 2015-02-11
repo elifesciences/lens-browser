@@ -4,8 +4,61 @@ var _ = require("underscore");
 var util = require("substance-util");
 var Controller = require("substance-application").Controller;
 var BrowserView = require("./browser_view");
+
+var SearchQuery = require("./search_query");
 var SearchResult = require("./search_result");
-var SearchBarController = require("./searchbar_controller");
+
+
+
+// Used to initialize the SearchQuery model
+var EMPTY_QUERY = {
+  searchStr: "",
+  filters: {}
+};
+
+var EXAMPLE_QUERY = {
+  searchStr: "mouse",
+  filters: {
+    "subjects": ["Neuroscience"],
+    "article_type": ["Research article"]
+  }
+};
+
+var AVAILABLE_SUGGESTIONS = {
+  "subjects": {
+    "name": "Subjects",
+    "entries": [
+      "Biochemistry",
+      "Biophysics and structural biology",
+      "Cancer biology",
+      "Cell biology",
+      "Computational and systems biology",
+      "Developmental biology and stem cells",
+      "Ecology",
+      "Epidemiology and global health",
+      "Genes and chromosomes",
+      "Genomics and evolutionary biology",
+      "Human biology and medicine",
+      "Immunology",
+      "Microbiology and infectious disease",
+      "Neuroscience",
+      "Plant biology"
+    ]
+  },
+  "article_type": {
+    "name": "Content Type",
+    "entries": [
+      "Editorial",
+      "Feature article",
+      "Insight",
+      "Research article",
+      "Short report",
+      "Research advance",
+      "Registered report",
+      "Correction"
+    ]
+  }
+};
 
 // BrowserController
 // =============================
@@ -13,8 +66,11 @@ var SearchBarController = require("./searchbar_controller");
 var BrowserController = function(app, config) {
   Controller.call(this, app);
   this.config = config;
-  this.searchbarCtrl = new SearchBarController(this);
+
+  this.searchQuery = new SearchQuery(EMPTY_QUERY);
   this.createView();
+
+  this.searchQuery.on('query:changed', _.bind(this.startSearch, this));
 };
 
 BrowserController.Prototype = function() {
@@ -27,11 +83,47 @@ BrowserController.Prototype = function() {
     id: "main"
   };
 
+  // Initiate a new search by making a state change
+  // ------------------
+
+  this.startSearch = function() {
+    console.log('starting a new search');
+
+    this.switchState({
+      id: "main",
+      searchQuery: this.searchQuery.toJSON(),
+    }, {updateRoute: true, replace: true});
+  };
+
+  // Available search suggestions
+  // SearchbarView needs this
+  this.getSuggestions = function(searchStr) {
+    var suggestions = [];
+
+    if (!searchStr) return [];
+
+    _.each(AVAILABLE_FACETS, function(facet, facetKey) {
+      _.each(facet.entries, function(entry) {
+        if (entry.toLowerCase().match(searchStr.toLowerCase())) {
+          suggestions.push({
+            value: entry.replace(searchStr, "<b>"+searchStr+"</b>"),
+            rawValue: entry,
+            facet: facetKey,
+            facetName: facet.name
+          });
+        }
+      });
+    });
+
+    // only return MAX_SUGGESTIONS
+    return suggestions;
+  };
+
   this.createView = function() {
     if (!this.view) {
       this.view = new BrowserView(this);
     }
-    return this.view.render();
+    return this.view;
   };
 
   this.transition = function(newState, cb) {
@@ -50,10 +142,22 @@ BrowserController.Prototype = function() {
       // TODO: load a set of featured articles
       // if (!newState.searchstr) return cb(null);
       // debugger;
-      
-      if (this.state.id === "uninitialized" || newState.searchstr !== this.state.searchstr || !_.isEqual(newState.searchFilters, this.state.searchFilters)) {
-        // Search result has changed after initialization
+      if (this.state.id === "uninitialized") {
+        // Set the initial search query from app state
+        console.log('setting initial query', newState.searchQuery);
+
+        var query = newState.searchQuery;
+        if (!query) query = EXAMPLE_QUERY;
+        this.searchQuery.setQuery(query);
+        // this.loadSearchResult(newState, cb);
+      }
+
+      if (!_.isEqual(newState.searchQuery, this.state.searchQuery)) {
+        // Search query has changed
         this.loadSearchResult(newState, cb);
+        // } else if (newState.searchstr !== this.state.searchstr || !_.isEqual(newState.searchFilters, this.state.searchFilters)) {
+        //   // Search result has changed after initialization
+        //   this.loadSearchResult(newState, cb);
       } else if (!_.isEqual(newState.filters, this.state.filters)) {
         // Filters have been changed
         this.filterDocuments(newState, cb);
@@ -65,16 +169,11 @@ BrowserController.Prototype = function() {
         // cb(null);
         return cb(null, {skip: true});
       }
-
     } else {
       console.log('state not explicitly handled', this.state, newState);
       return cb(null);
       // cb(null);
     }
-  };
-
-  this.encodeFilters = function() {
-
   };
 
   // Encode search filters so they can be provided to the search API as a query string
@@ -150,27 +249,28 @@ BrowserController.Prototype = function() {
   // TODO: error handling
 
   this.loadSearchResult = function(newState, cb) {
-
     this.view.showLoading();
 
     // Get filters from app state
     var searchStr = newState.searchstr || "";
+    
+    var searchQuery = newState.searchQuery;
     var documentId = newState.documentId;
-    var filters = this.getFilters(newState);
-    var searchFilters = this.getSearchFilters(newState);
+    // var filters = this.getFilters(newState);
+    // var searchFilters = this.getSearchFilters(newState);
     var self = this;
-
-    var encodedSearchFilters = this.encodeSearchFilters(searchFilters);
+    // var encodedSearchFilters = this.encodeSearchFilters(searchFilters);
 
     $.ajax({
-      url: this.config.api_url+"/search?searchString="+encodeURIComponent(searchStr)+"&"+encodedSearchFilters,
+      url: this.config.api_url+"/search?searchQuery="+encodeURIComponent(JSON.stringify(searchQuery)),
       dataType: 'json',
       success: function(matchingDocs) {
+
         // TODO: this structure should be provided on the server
         self.searchResult = new SearchResult({
           query: newState.searchstr,
           documents: matchingDocs
-        }, filters);
+        }, {});
 
         // Preview first document by default
         if (!documentId && matchingDocs.length > 0) {

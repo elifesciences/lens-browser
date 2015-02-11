@@ -3,6 +3,8 @@
 var _ = require("underscore");
 var View = require("substance-application").View;
 var $$ = require("substance-application").$$;
+var SearchbarView = require("./searchbar_view");
+
 
 // Browser.View Constructor
 // ========
@@ -20,7 +22,7 @@ var BrowserView = function(controller) {
   // Search bar
   // ------------
 
-  this.searchbarView = this.controller.searchbarCtrl.createView();
+  this.searchbarView = new SearchbarView(this.controller.searchQuery);
 
   // List of found documents
   // ------------
@@ -43,13 +45,13 @@ var BrowserView = function(controller) {
   // Event handlers
   // ------------
 
-  $(this.searchButton).click(_.bind(this.startSearch, this));
-  $(this.searchFieldEl).change(_.bind(this.startSearch, this));
+  // $(this.searchButton).click(_.bind(this.startSearch, this));
+  // $(this.searchFieldEl).change(_.bind(this.startSearch, this));
   this.$el.on('click', '.value', _.bind(this.toggleFilter, this));
   this.$el.on('click', '.title a', _.bind(this.togglePreview, this));
 
   // Should this work on the controller?
-  this.searchbarView.on('search:changed', _.bind(this.startSearch, this));
+  // this.searchbarView.on('search:changed', _.bind(this.startSearch, this));
 };
 
 BrowserView.Prototype = function() {
@@ -58,16 +60,16 @@ BrowserView.Prototype = function() {
   // --------
   //
 
-  this.startSearch = function(e) {
-    var searchData = this.searchbarView.getSearchData();
-    var searchFilters = searchData.filters;
+  // this.startSearch = function(e) {
+  //   var searchData = this.searchbarView.getSearchData();
+  //   var searchFilters = searchData.filters;
 
-    this.controller.switchState({
-      id: "main",
-      searchstr: searchData.searchStr,
-      searchFilters: searchFilters
-    });
-  };
+  //   this.controller.switchState({
+  //     id: "main",
+  //     searchstr: searchData.searchStr,
+  //     searchFilters: searchFilters
+  //   });
+  // };
 
   // Show the loading indicator
   this.showLoading = function() {
@@ -147,11 +149,11 @@ BrowserView.Prototype = function() {
       // console.log('searchstr', newState.searchstr);
 
       // Prepare search data for searchbar view
-      this.searchbarView.setSearchData({
-        searchstr: newState.searchstr,
-        // It's important that we pass a clone here, so the searchbar doesn't mess with the state variable object
-        searchFilters: newState.searchFilters ? JSON.parse(JSON.stringify(newState.searchFilters)) : []
-      });
+      // this.searchbarView.setSearchData({
+      //   searchstr: newState.searchstr,
+      //   // It's important that we pass a clone here, so the searchbar doesn't mess with the state variable object
+      //   searchFilters: newState.searchFilters ? JSON.parse(JSON.stringify(newState.searchFilters)) : []
+      // });
 
       // if (newState.searchstr) {
       this.renderSearchResult();
@@ -196,6 +198,10 @@ BrowserView.Prototype = function() {
 
   // Display initial search result
   this.renderSearchResult = function() {
+
+    // Check if there's an actual search result
+    if (!this.controller.searchResult) return;
+
     this.documentsEl.innerHTML = "";
 
     // Hide loading indicator
@@ -375,8 +381,9 @@ BrowserView.Prototype = function() {
   };
 
   this.render = function() {
+    console.log('BrowserView#render');
     this.el.innerHTML = "";
-    this.el.appendChild(this.searchbarView.render().el);  
+    this.el.appendChild(this.searchbarView.render().el);
     this.el.appendChild(this.panelWrapperEl);
     return this;
   };

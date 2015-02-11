@@ -20,7 +20,7 @@ LensBrowserApplication.Prototype = function() {
     __super__.start.call(this, options);
 
     // Inject main view
-    this.el.appendChild(this.controller.view.el);
+    this.el.appendChild(this.controller.view.render().el);
 
     if (!window.location.hash) {
       this.switchState([{ id: "main" }], { updateRoute: true, replace: true });
