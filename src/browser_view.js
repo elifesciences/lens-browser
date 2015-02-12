@@ -4,6 +4,7 @@ var _ = require("underscore");
 var View = require("substance-application").View;
 var $$ = require("substance-application").$$;
 var SearchbarView = require("./searchbar_view");
+var PreviewView = require("./preview_view");
 
 // Browser.View Constructor
 // ========
@@ -21,7 +22,9 @@ var BrowserView = function(controller) {
   // Search bar
   // ------------
 
-  this.searchbarView = new SearchbarView(this.controller.searchQuery);
+  this.searchbarView = new SearchbarView(this.controller.searchQuery, {
+    getSuggestions: _.bind(this.controller.getSuggestions, this.controller)
+  });
 
   // Facets panel
   // ------------
@@ -31,8 +34,9 @@ var BrowserView = function(controller) {
   // Preview panel
   // ------------
 
-  // TODO: create PreviewView
+  
 
+  // TODO: create PreviewView
 
   // List of found documents
   // ------------
@@ -59,13 +63,19 @@ var BrowserView = function(controller) {
   // $(this.searchFieldEl).change(_.bind(this.startSearch, this));
 
   // this.$el.on('click', '.value', _.bind(this.toggleFilter, this));
-  // this.$el.on('click', '.title a', _.bind(this.togglePreview, this));
+  this.$el.on('click', '.title a', _.bind(this.togglePreview, this));
 
   // Should this work on the controller?
   // this.searchbarView.on('search:changed', _.bind(this.startSearch, this));
 };
 
 BrowserView.Prototype = function() {
+
+  this.togglePreview = function(e) {
+    e.preventDefault();
+    var documentId = $(e.currentTarget).parent().parent().attr('data-id');
+    this.controller.openPreview(documentId);
+  };
 
   // Show the loading indicator
   this.showLoading = function() {
@@ -87,17 +97,27 @@ BrowserView.Prototype = function() {
   // TODO: optimize! (currently we re-render everything)
 
   this.afterTransition = function(oldState, newState) {
-    console.log('BrowserView#after transition');
+    console.log('BrowserView#afterTransition');
     if (newState.id === "main") {
 
       // if (newState.searchstr) {
       if (!_.isEqual(newState.searchQuery, oldState.searchQuery)) {
         this.renderSearchResult();
+        if (this.controller.previewData) {
+          this.renderPreview();  
+        }
         // TODO: update facets view
-      } else if (newState.documentId !== oldState.documentId) {
+      } else if (newState.documentId && newState.documentId !== oldState.documentId) {
         console.log('render preview now');
+        this.renderPreview();
       }
     }
+  };
+
+  this.renderPreview = function() {
+    this.previewView = new PreviewView(this.controller.previewData);
+    this.previewEl.innerHTML = "";
+    this.previewEl.appendChild(this.previewView.render().el);
   };
 
   // Display initial search result
@@ -113,7 +133,6 @@ BrowserView.Prototype = function() {
 
     // highlight previewed document
     var documentId = this.controller.state.documentId;
-
 
     // Get filtered documents
     var documents = this.controller.searchResult.getDocuments();

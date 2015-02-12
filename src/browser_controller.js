@@ -90,7 +90,16 @@ BrowserController.Prototype = function() {
     this.switchState({
       id: "main",
       searchQuery: this.searchQuery.toJSON(),
-    }, {updateRoute: true, replace: true});
+    });
+  };
+
+  // this.controller.openPreview(documentId);
+  this.openPreview = function(documentId) {
+    this.switchState({
+      id: "main",
+      searchQuery: this.searchQuery.toJSON(),
+      documentId: documentId
+    });
   };
 
   // Available search suggestions
@@ -100,7 +109,7 @@ BrowserController.Prototype = function() {
 
     if (!searchStr) return [];
 
-    _.each(AVAILABLE_FACETS, function(facet, facetKey) {
+    _.each(AVAILABLE_SUGGESTIONS, function(facet, facetKey) {
       _.each(facet.entries, function(entry) {
         if (entry.toLowerCase().match(searchStr.toLowerCase())) {
           suggestions.push({
@@ -126,6 +135,7 @@ BrowserController.Prototype = function() {
 
   this.transition = function(newState, cb) {
     console.log("BrowserController.transition(%s -> %s)", this.state.id, newState.id);
+
     // idem-potence
     // if (newState.id === this.state.id) {
     //   var skip = false;
@@ -138,24 +148,16 @@ BrowserController.Prototype = function() {
 
       if (this.state.id === "uninitialized") {
         // Set the initial search query from app state
-        // TODO: this could be done in a 
+        // TODO: this could be done in a onInitialize hook?
         console.log('setting initial query', newState.searchQuery);
-
         var query = newState.searchQuery;
         if (!query) query = EXAMPLE_QUERY;
         this.searchQuery.setQuery(query);
-        // this.loadSearchResult(newState, cb);
       }
 
       if (!_.isEqual(newState.searchQuery, this.state.searchQuery)) {
         // Search query has changed
         this.loadSearchResult(newState, cb);
-        // } else if (newState.searchstr !== this.state.searchstr || !_.isEqual(newState.searchFilters, this.state.searchFilters)) {
-        //   // Search result has changed after initialization
-        //   this.loadSearchResult(newState, cb);
-      } else if (!_.isEqual(newState.filters, this.state.filters)) {
-        // Filters have been changed
-        this.filterDocuments(newState, cb);
       } else if (newState.documentId && newState.documentId !== this.state.documentId) {
         // Selected document has been changed
         this.loadPreview(newState.documentId, newState.searchstr, cb);
@@ -187,7 +189,7 @@ BrowserController.Prototype = function() {
         data.document.id = documentId;
         data.document.url = "http://lens.elifesciences.org/" + elifeID;
         data.document.pdf_url = "http://cdn.elifesciences.org/elife-articles/"+elifeID+"/pdf/elife"+elifeID+".pdf";
-
+        data.searchStr = searchStr;
         self.previewData = data;
         cb(null);
       },
@@ -201,8 +203,6 @@ BrowserController.Prototype = function() {
   // Search result gets loaded
   // -----------------------
   // 
-  // Filters must be applied too, if there are any
-  // Preview must be loaded as well, if documentId is provided
   // TODO: error handling
 
   this.loadSearchResult = function(newState, cb) {
@@ -217,15 +217,18 @@ BrowserController.Prototype = function() {
       url: this.config.api_url+"/search?searchQuery="+encodeURIComponent(JSON.stringify(searchQuery)),
       dataType: 'json',
       success: function(matchingDocs) {
-
         // TODO: this structure should be provided on the server
         self.searchResult = new SearchResult({
           query: newState.searchstr,
           documents: matchingDocs
         }, {});
 
-        self.previewData = null;
-        cb(null);
+        if (documentId) {
+          self.loadPreview(documentId, searchQuery.searchStr, cb);
+        } else {
+          self.previewData = null;
+          cb(null);          
+        }
       },
       error: function(err) {
         console.error(err.responseText);

@@ -28,6 +28,10 @@ SearchQuery.Prototype = function() {
     this.trigger("query:changed");
   };
 
+  this.removeLastFilter = function() {
+    console.log('TODO: Implement.');
+  };
+
   this.updateSearchStr = function(searchStr) {
     this.searchStr = searchStr;
     this.trigger("query:changed");

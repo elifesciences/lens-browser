@@ -18,6 +18,7 @@ var SearchbarView = function(searchQuery, options) {
 
   // Model contains the search query
   this.searchQuery = searchQuery;
+  this.options = options;
 
   // Elements
   // --------
@@ -44,15 +45,15 @@ var SearchbarView = function(searchQuery, options) {
   // Event handlers
   // ------------
 
-  // $(this.searchFieldInputEl).keyup(_.bind(this._updateSuggestions, this));
+  $(this.searchFieldInputEl).keyup(_.bind(this._updateSuggestions, this));
   
-  // $(this.searchFieldInputEl).keydown(_.bind(this._interpretKey, this));
+  $(this.searchFieldInputEl).keydown(_.bind(this._interpretKey, this));
   // $(this.searchFieldInputEl).focus(_.bind(this._updateSuggestions, this));
 
   // $(this.searchFieldInputEl).blur(_.bind(this._hideSuggestions, this));
 
-  // $(this.el).click(_.bind(this._hideSuggestions, this));
-  // this.$el.on('click', '.search-field-suggestion', _.bind(this._addFilter, this));
+  $(this.el).click(_.bind(this._hideSuggestions, this));
+  this.$el.on('click', '.search-field-suggestion', _.bind(this._addFilter, this));
 
   this.$el.on('click', '.remove-filter', _.bind(this._removeFilter, this));
 
@@ -65,7 +66,6 @@ SearchbarView.Prototype = function() {
 
   this._updateSearchStr = function(e) {
     var searchStr = $(e.currentTarget).val();
-
     this.searchQuery.updateSearchStr(searchStr);
 
     e.preventDefault();
@@ -76,7 +76,6 @@ SearchbarView.Prototype = function() {
     e.preventDefault();
     var facet = $(e.currentTarget).attr("data-facet");
     var filterVal = $(e.currentTarget).attr("data-value");
-    console.log('removing filter...', facet, filterVal);
     this.searchQuery.removeFilter(facet, filterVal);
   };
 
@@ -84,38 +83,35 @@ SearchbarView.Prototype = function() {
   // --------
   //
 
-  // this._interpretKey = function(e) {
-  //   var searchStr = $(e.currentTarget).val();
-  //   if (e.keyCode === 8 && searchStr === "") {
-  //     this.controller.removeLastFilter();
-  //     this.trigger('search:changed');
-  //     this.renderFilters();
-  //   } else {
-  //     if (e.keyCode === 40) {
-  //       // arrow down
-  //       console.log('arrow down');
-  //       this.nextSuggestion();
-  //       e.preventDefault();
-  //     } else if (e.keyCode === 38) {
-  //       // arrow up
-  //       console.log('arrow up');
-  //       this.prevSuggestion();
-  //       e.preventDefault();
-  //     } else if (e.keyCode === 13) {
-  //       console.log('choose suggestion');
-  //       this.chooseSuggestion();
-  //     }
-  //   }
-  // };
+  this._interpretKey = function(e) {
+    var searchStr = $(e.currentTarget).val();
+    if (e.keyCode === 8 && searchStr === "") {
+      this.searchQuery.removeLastFilter();
+      // this.renderFilters();
+    } else {
+      if (e.keyCode === 40) {
+        // arrow down
+        this.nextSuggestion();
+        e.preventDefault();
+      } else if (e.keyCode === 38) {
+        // arrow up
+        this.prevSuggestion();
+        e.preventDefault();
+      } else if (e.keyCode === 13) {
+        console.log('choose suggestion');
+        this.chooseSuggestion();
+      }
+    }
+  };
 
-  // this._updateSuggestions = function(e) {
-  //   var searchStr = $(e.currentTarget).val();
+  this._updateSuggestions = function(e) {
+    var searchStr = $(e.currentTarget).val();
 
-  //   // ignore keyup/keydown/enter
-  //   if (_.include([40, 38, 13],e.keyCode)) return;
+    // ignore keyup/keydown/enter
+    if (_.include([40, 38, 13],e.keyCode)) return;
 
-  //   this.renderSuggestions(searchStr);
-  // };
+    this.renderSuggestions(searchStr);
+  };
 
   // this.setSearchData = function(data) {
   //   this.controller.searchstr = data.searchstr;
@@ -135,48 +131,45 @@ SearchbarView.Prototype = function() {
   // };
 
   // Delay a bit so click handlers can be triggered on suggested elements
-  // this._hideSuggestions = function(e) {
-  //   var el = this.searchFieldSuggestionsEl;
-  //   // $(el).hide();
+  this._hideSuggestions = function(e) {
+    var el = this.searchFieldSuggestionsEl;
+    // $(el).hide();
 
-  //   _.delay(function() {
-  //     $(el).hide();
-  //   }, 200, this);
-  // };
+    _.delay(function() {
+      $(el).hide();
+    }, 200, this);
+  };
 
-  // this._addFilter = function(e) {
-  //   var $el = $(e.currentTarget);
-  //   var facet = $el.attr('data-facet');
-  //   var value = $el.attr('data-value');
+  this._addFilter = function(e) {
+    var $el = $(e.currentTarget);
+    var facet = $el.attr('data-facet');
+    var value = $el.attr('data-value');
 
-  //   this.controller.addFilter(facet, value);
-  //   this.renderFilters();
-  //   this._hideSuggestions();
-  //   // reset searchfield
-  //   $(this.searchFieldInputEl).val('').focus();
-  //   e.preventDefault();
-  //   this.trigger('search:changed');
-  // };
+    this.searchQuery.addFilter(facet, value);
+    this._hideSuggestions();
+    // reset searchfield
+    $(this.searchFieldInputEl).val('').focus();
+    e.preventDefault();
+  };
 
-  // this.chooseSuggestion = function() {
-  //   // when enter has been pressed
-  //   var $activeSuggestion = this.$('.search-field-suggestion.active');
+  this.chooseSuggestion = function() {
+    // when enter has been pressed
+    var $activeSuggestion = this.$('.search-field-suggestion.active');
 
-  //   if ($activeSuggestion.length > 0) {
-  //     $activeSuggestion.trigger('click');
-  //   } else {
-  //     this.trigger('search:changed');
-  //     this._hideSuggestions();
-  //   }
-  // };
+    if ($activeSuggestion.length > 0) {
+      $activeSuggestion.trigger('click');
+    } else {
+      this._hideSuggestions();
+    }
+  };
 
   // Rendering
   // ==========================================================================
   //
 
   this.render = function() {
-    this.renderFilters();
-    // this.renderSuggestions();
+    console.log('rendering searchbar view');
+    this.updateView();
     return this;
   };
 
@@ -208,56 +201,57 @@ SearchbarView.Prototype = function() {
     this.renderFilters();
   };
 
-  // TODO: find simpler implementation
+  // TODO: find simpler implementation for keyboard nav
 
-  // this.prevSuggestion = function() {
-  //   var suggestionEls = this.searchFieldSuggestionsEl.childNodes;
+  this.prevSuggestion = function() {
+    var suggestionEls = this.searchFieldSuggestionsEl.childNodes;
 
-  //   if (suggestionEls.length > 0) {
-  //     var $activeEl = this.$('.search-field-suggestion.active');
-  //     if ($activeEl.length === 0) {
-  //       // select last element
-  //       $(_.last(suggestionEls)).addClass('active');
-  //     } else {
-  //       $activeEl.removeClass('active');
-  //       $activeEl.prev().addClass('active');
-  //     }
-  //   }
-  // };
+    if (suggestionEls.length > 0) {
+      var $activeEl = this.$('.search-field-suggestion.active');
+      if ($activeEl.length === 0) {
+        // select last element
+        $(_.last(suggestionEls)).addClass('active');
+      } else {
+        $activeEl.removeClass('active');
+        $activeEl.prev().addClass('active');
+      }
+    }
+  };
 
-  // this.nextSuggestion = function() {
-  //   var suggestionEls = this.searchFieldSuggestionsEl.childNodes;
+  this.nextSuggestion = function() {
+    var suggestionEls = this.searchFieldSuggestionsEl.childNodes;
 
-  //   if (suggestionEls.length > 0) {
-  //     var $activeEl = this.$('.search-field-suggestion.active');
-  //     if ($activeEl.length === 0) {
-  //       // select first element
-  //       $(suggestionEls[0]).addClass('active');
-  //     } else {
-  //       $activeEl.removeClass('active');
-  //       $activeEl.next().addClass('active');
-  //     }
-  //   }
-  // };
+    if (suggestionEls.length > 0) {
+      var $activeEl = this.$('.search-field-suggestion.active');
+      if ($activeEl.length === 0) {
+        // select first element
+        $(suggestionEls[0]).addClass('active');
+      } else {
+        $activeEl.removeClass('active');
+        $activeEl.next().addClass('active');
+      }
+    }
+  };
 
   // Render suggestions
   // ------------------
 
-  // this.renderSuggestions = function(searchStr) {
-  //   var suggestions = this.controller.getSuggestions(searchStr);
-  //   this.searchFieldSuggestionsEl.innerHTML = "";
-  //   _.each(suggestions, function(suggestion) {
-  //     var suggestionEl = $$('a.search-field-suggestion', {
-  //       html: '<i class="fa '+ICON_MAPPING[suggestion.facet]+'"></i> '+ suggestion.value,
-  //       href: "#",
-  //       "data-value": suggestion.rawValue,
-  //       "data-facet": suggestion.facet
-  //     });
-  //     this.searchFieldSuggestionsEl.appendChild(suggestionEl);
-  //   }, this);
+  this.renderSuggestions = function(searchStr) {
+    var suggestions = this.options.getSuggestions(searchStr);
+    
+    this.searchFieldSuggestionsEl.innerHTML = "";
+    _.each(suggestions, function(suggestion) {
+      var suggestionEl = $$('a.search-field-suggestion', {
+        html: '<i class="fa '+ICON_MAPPING[suggestion.facet]+'"></i> '+ suggestion.value,
+        href: "#",
+        "data-value": suggestion.rawValue,
+        "data-facet": suggestion.facet
+      });
+      this.searchFieldSuggestionsEl.appendChild(suggestionEl);
+    }, this);
 
-  //   $(this.searchFieldSuggestionsEl).show();
-  // };
+    $(this.searchFieldSuggestionsEl).show();
+  };
 
   this.dispose = function() {
     this.stopListening();
