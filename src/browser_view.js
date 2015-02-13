@@ -72,7 +72,6 @@ BrowserView.Prototype = function() {
     e.preventDefault();
     var facet = $(e.currentTarget).attr("data-facet");
     var facetValue = $(e.currentTarget).attr("data-value");
-    console.log("S=S", this.controller.state.searchQuery.filters === this.controller.searchQuery.filters);
 
     console.log('toggling', facet, facetValue);
     this.controller.searchQuery.addFilter(facet, facetValue);
