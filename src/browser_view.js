@@ -5,6 +5,7 @@ var View = require("substance-application").View;
 var $$ = require("substance-application").$$;
 var SearchbarView = require("./searchbar_view");
 var PreviewView = require("./preview_view");
+var FacetsView = require("./facets_view");
 
 // Browser.View Constructor
 // ========
@@ -25,16 +26,6 @@ var BrowserView = function(controller) {
   this.searchbarView = new SearchbarView(this.controller.searchQuery, {
     getSuggestions: _.bind(this.controller.getSuggestions, this.controller)
   });
-
-  // Facets panel
-  // ------------
-
-  // TODO: create FacetsView
-
-  // Preview panel
-  // ------------
-
-  
 
   // TODO: create PreviewView
 
@@ -62,8 +53,8 @@ var BrowserView = function(controller) {
   // $(this.searchButton).click(_.bind(this.startSearch, this));
   // $(this.searchFieldEl).change(_.bind(this.startSearch, this));
 
-  // this.$el.on('click', '.value', _.bind(this.toggleFilter, this));
-  this.$el.on('click', '.title a', _.bind(this.togglePreview, this));
+  this.$el.on('click', '.available-facets .value', _.bind(this.toggleFilter, this));
+  this.$el.on('click', '.document', _.bind(this.togglePreview, this));
 
   // Should this work on the controller?
   // this.searchbarView.on('search:changed', _.bind(this.startSearch, this));
@@ -73,8 +64,18 @@ BrowserView.Prototype = function() {
 
   this.togglePreview = function(e) {
     e.preventDefault();
-    var documentId = $(e.currentTarget).parent().parent().attr('data-id');
+    var documentId = $(e.currentTarget).attr('data-id');
     this.controller.openPreview(documentId);
+  };
+
+  this.toggleFilter = function(e) {
+    e.preventDefault();
+    var facet = $(e.currentTarget).attr("data-facet");
+    var facetValue = $(e.currentTarget).attr("data-value");
+    console.log("S=S", this.controller.state.searchQuery.filters === this.controller.searchQuery.filters);
+
+    console.log('toggling', facet, facetValue);
+    this.controller.searchQuery.addFilter(facet, facetValue);
   };
 
   // Show the loading indicator
@@ -94,35 +95,48 @@ BrowserView.Prototype = function() {
   // After state transition
   // --------------
   // 
-  // TODO: optimize! (currently we re-render everything)
 
   this.afterTransition = function(oldState, newState) {
-    console.log('BrowserView#afterTransition');
     if (newState.id === "main") {
-
-      // if (newState.searchstr) {
       if (!_.isEqual(newState.searchQuery, oldState.searchQuery)) {
         this.renderSearchResult();
-        if (this.controller.previewData) {
-          this.renderPreview();  
-        }
+        this.renderPreview();
         // TODO: update facets view
       } else if (newState.documentId && newState.documentId !== oldState.documentId) {
-        console.log('render preview now');
+        console.log('render preview now', this.controller.previewData);
         this.renderPreview();
       }
     }
   };
 
   this.renderPreview = function() {
-    this.previewView = new PreviewView(this.controller.previewData);
+    var documentId = this.controller.state.documentId;
+
     this.previewEl.innerHTML = "";
-    this.previewEl.appendChild(this.previewView.render().el);
+    this.$('.document').removeClass('active')
+
+    if (documentId) {
+      this.previewView = new PreviewView(this.controller.previewData);
+      this.previewEl.appendChild(this.previewView.render().el);
+
+      // Highlight previewed document in result list
+      this.$('.document').each(function() {
+        if (documentId === this.dataset.id) {
+          $(this).addClass('active');
+        }
+      });
+    }
+  };
+
+  this.renderFacets = function() {
+    console.log('rendering facets...');
+    this.facetsView = new FacetsView(this.controller.searchResult.getAvailableFacets());
+    this.facetsEl.innerHTML = "";
+    this.facetsEl.appendChild(this.facetsView.render().el);
   };
 
   // Display initial search result
   this.renderSearchResult = function() {
-
     // Check if there's an actual search result
     if (!this.controller.searchResult) return;
 
@@ -130,9 +144,6 @@ BrowserView.Prototype = function() {
 
     // Hide loading indicator
     this.hideLoading();
-
-    // highlight previewed document
-    var documentId = this.controller.state.documentId;
 
     // Get filtered documents
     var documents = this.controller.searchResult.getDocuments();
@@ -161,7 +172,7 @@ BrowserView.Prototype = function() {
           children: [
             $$('.published-on', {text: new Date(doc.published_on).toDateString() }),
             $$('.title', {
-              children: [$$('a', {href: '#', html: doc.title})]
+              html: doc.title
             }),
             $$('.authors', {
               children: authors
@@ -173,6 +184,8 @@ BrowserView.Prototype = function() {
 
         this.documentsEl.appendChild(documentEl);
       }, this);
+
+      this.renderFacets();
     } else {
       // Render no search result
       this.documentsEl.appendChild($$('.no-result', {text: "Your search did not match any documents"}));

@@ -181,7 +181,7 @@ SearchbarView.Prototype = function() {
     _.each(this.searchQuery.filters, function(filterValues, facet) {
       _.each(filterValues, function(filterVal) {
         var filterEl = $$('.search-field-filter', {
-          html: '<i class="fa '+ICON_MAPPING[facet]+'"></i> '+ filterVal +' <a href="#" class="remove-filter" data-facet="'+facet+'" data-value="'+filterVal+'">x</a>'
+          html: '<i class="fa '+ICON_MAPPING[facet]+'"></i> '+ filterVal +' <a href="#" class="remove-filter" data-facet="'+facet+'" data-value="'+filterVal+'"><i class="fa fa-remove"></i></a>'
         });
         this.searchFieldFilters.appendChild(filterEl);
       }, this);

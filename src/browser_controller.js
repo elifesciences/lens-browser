@@ -85,11 +85,10 @@ BrowserController.Prototype = function() {
   // ------------------
 
   this.startSearch = function() {
-    console.log('starting a new search');
-
+    // console.log('query changed', this.searchQuery);
     this.switchState({
       id: "main",
-      searchQuery: this.searchQuery.toJSON(),
+      searchQuery: this.searchQuery.toJSON()
     });
   };
 
@@ -150,8 +149,13 @@ BrowserController.Prototype = function() {
         // Set the initial search query from app state
         // TODO: this could be done in a onInitialize hook?
         console.log('setting initial query', newState.searchQuery);
-        var query = newState.searchQuery;
-        if (!query) query = EXAMPLE_QUERY;
+
+        var query;
+        if (newState.searchQuery) {
+          query= JSON.parse(JSON.stringify(newState.searchQuery));
+        } else {
+          query = EXAMPLE_QUERY;
+        }
         this.searchQuery.setQuery(query);
       }
 
@@ -160,7 +164,7 @@ BrowserController.Prototype = function() {
         this.loadSearchResult(newState, cb);
       } else if (newState.documentId && newState.documentId !== this.state.documentId) {
         // Selected document has been changed
-        this.loadPreview(newState.documentId, newState.searchstr, cb);
+        this.loadPreview(newState.documentId, newState.searchQuery.searchStr, cb);
       } else {
         console.log('no state change detected, skipping', this.state, newState);
         // cb(null);
