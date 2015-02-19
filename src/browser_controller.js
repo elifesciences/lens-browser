@@ -26,35 +26,46 @@ var AVAILABLE_SUGGESTIONS = {
   "subjects": {
     "name": "Subjects",
     "entries": [
-      "Biochemistry",
-      "Biophysics and structural biology",
-      "Cancer biology",
-      "Cell biology",
-      "Computational and systems biology",
-      "Developmental biology and stem cells",
-      "Ecology",
-      "Epidemiology and global health",
-      "Genes and chromosomes",
-      "Genomics and evolutionary biology",
-      "Human biology and medicine",
-      "Immunology",
-      "Microbiology and infectious disease",
-      "Neuroscience",
-      "Plant biology"
+      {"name": "Biochemistry", "frequency": 4},
+      {"name": "Biophysics and structural biology", "frequency": 4},
+      {"name": "Cancer biology", "frequency": 4},
+      {"name": "Cell biology", "frequency": 4},
+      {"name": "Computational and systems biology", "frequency": 4},
+      {"name": "Developmental biology and stem cells", "frequency": 4},
+      {"name": "Ecology", "frequency": 4},
+      {"name": "Epidemiology and global health", "frequency": 4},
+      {"name": "Genes and chromosomes", "frequency": 4},
+      {"name": "Genomics and evolutionary biology", "frequency": 4},
+      {"name": "Human biology and medicine", "frequency": 4},
+      {"name": "Immunology", "frequency": 4},
+      {"name": "Microbiology and infectious disease", "frequency": 4},
+      {"name": "Neuroscience", "frequency": 4},
+      {"name": "Plant biology", "frequency": 4}
     ]
   },
   "article_type": {
     "name": "Content Type",
     "entries": [
-      "Editorial",
-      "Feature article",
-      "Insight",
-      "Research article",
-      "Short report",
-      "Research advance",
-      "Registered report",
-      "Correction"
+      {"name": "Editorial", "frequency": 4},
+      {"name": "Feature article", "frequency": 4},
+      {"name": "Insight", "frequency": 4},
+      {"name": "Research article", "frequency": 4},
+      {"name": "Short report", "frequency": 4},
+      {"name": "Research advance", "frequency": 4},
+      {"name": "Registered report", "frequency": 4},
+      {"name": "Correction", "frequency": 4}
     ]
+  },
+  "organisms": {
+    "name": "Research organism",
+    "entries": [
+      {"name": "Mouse", "frequency": 4},
+      {"name": "Human", "frequency": 4}
+    ]
+  },
+  "authors": {
+    "name": "Author",
+    "entries": []
   }
 };
 
@@ -105,15 +116,38 @@ BrowserController.Prototype = function() {
   // SearchbarView needs this
   this.getSuggestions = function(searchStr) {
     var suggestions = [];
+    var combinedFacets = JSON.parse(JSON.stringify(AVAILABLE_SUGGESTIONS));
 
+    if (this.searchResult) {
+      var searchResultFacets = {};
+      var availableFacets = this.searchResult.getAvailableFacets();
+
+      // build facet index
+      _.each(availableFacets, function(facet) {
+        searchResultFacets[facet.property] = {
+          name: facet.name,
+          entries: facet.values
+        }
+      });
+
+      _.each(combinedFacets, function(facet, facetKey) {
+        if (searchResultFacets[facetKey]) {
+          combinedFacets[facetKey].entries = _.union(combinedFacets[facetKey].entries, searchResultFacets[facetKey].entries);
+        }
+      });
+
+      console.log('avail facets', combinedFacets);
+    };
+
+    // searchStr = "mou";
     if (!searchStr) return [];
 
-    _.each(AVAILABLE_SUGGESTIONS, function(facet, facetKey) {
+    _.each(combinedFacets, function(facet, facetKey) {
       _.each(facet.entries, function(entry) {
-        if (entry.toLowerCase().match(searchStr.toLowerCase())) {
+        if (entry.name.toLowerCase().match(searchStr.toLowerCase())) {
           suggestions.push({
-            value: entry.replace(searchStr, "<b>"+searchStr+"</b>"),
-            rawValue: entry,
+            value: entry.name.replace(searchStr, "<b>"+searchStr+"</b>"),
+            rawValue: entry.name,
             facet: facetKey,
             facetName: facet.name
           });
@@ -121,6 +155,7 @@ BrowserController.Prototype = function() {
       });
     });
 
+    console.log('Suggs', suggestions);
     // only return MAX_SUGGESTIONS
     return suggestions;
   };
@@ -154,7 +189,7 @@ BrowserController.Prototype = function() {
         if (newState.searchQuery) {
           query= JSON.parse(JSON.stringify(newState.searchQuery));
         } else {
-          query = EXAMPLE_QUERY;
+          query = EMPTY_QUERY;
         }
         this.searchQuery.setQuery(query);
       }
@@ -227,6 +262,8 @@ BrowserController.Prototype = function() {
           documents: matchingDocs
         }, {});
 
+
+        self.getSuggestions();
         if (documentId) {
           self.loadPreview(documentId, searchQuery.searchStr, cb);
         } else {

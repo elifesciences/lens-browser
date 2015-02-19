@@ -61,12 +61,12 @@ blockquote, q {
 */
 
 body {
-  overflow: hidden;
-  position: fixed;
-  left: 0px;
+/*  overflow: hidden;
+  position: fixed;*/
+/*  left: 0px;
   right: 0px;
   top: 0px;
-  bottom: 0px;
+  bottom: 0px;*/
 
   font-family: 'Source Sans Pro', Helvetica, Arial, Verdana, sans-serif;
   color: #505050;  
@@ -91,20 +91,20 @@ a:hover {
 */
 
 #container {
-  position: absolute;
+/*  position: absolute;
   top: 0px;
   bottom: 0px;
   left: 0px;
   right: 0px;
-  overflow: hidden;
-  height: 100%;
+  overflow: hidden;*/
+  /*height: 100%;*/
 }
 
 .searchbar {
-  position: fixed;
+/*  position: fixed;
   top: 0px;
   left: 0px;
-  right: 0px;
+  right: 0px;*/
 
   background: #eee;
   border-bottom: 1px solid #ddd;
@@ -114,12 +114,12 @@ a:hover {
 }
 
 #container .panel-wrapper {
-  position: absolute;
-  top: 60px;
+  /*position: absolute;*/
+/*  top: 60px;
   bottom: 0px;
   left: 0px;
-  right: 0px;
-  overflow: hidden;
+  right: 0px;*/
+  overflow: auto;
 }
 
 /* Loading indicator */
@@ -190,19 +190,20 @@ body.loading .spinner-wrapper {
 /* Documents result list */
 
 #facets {
-  float: left;
-  height: 100%;
-  width: 20%;
-  background: #f7f7f7;
-  border-right: 1px solid #ddd;
+  /*display: none;*/
+  float: right;
+  /*height: 100%;*/
+  width: 30%;
+  /*background: #f7f7f7;*/
+  /*border-right: 1px solid #ddd;*/
   overflow: auto;
 }
 
 #documents {
   float: left;
-  width: 45%;
-  height: 100%;
-  border-right: 1px solid #ddd;
+  width: 70%;
+  /*height: 100%;*/
+  /*border-right: 1px solid #ddd;*/
 }
 
 
@@ -210,29 +211,23 @@ body.loading .spinner-wrapper {
 ---------------------------------
 */
 
-#preview {
-  background: #fff;
-  float: right;
-  width: 35%;
-  height: 100%;
-  overflow: auto;
+.document .preview {
   font-size: 14px;
   padding: 20px;
   line-height: 20px;
+  margin-left: 30px;
 }
 
-
-
-#preview .fragment {
+.document .preview .fragment {
   padding-bottom: 20px;
 }
 
-#preview .published-on {
+.document .preview .published-on {
   color: #888;
   padding-bottom: 5px;
 }
 
-#preview .title {
+.document .preview .title {
   color: rgba(0,0,0,0.8);
   font-weight: 600;
   font-size: 20px;
@@ -277,7 +272,6 @@ body.loading .spinner-wrapper {
 ---------------------------------
 */
 
-
 .search-field {
   display: block;
   float: left;
@@ -289,6 +283,7 @@ body.loading .spinner-wrapper {
   padding: 0 5px;
   font-size: 13px;
   background: #fff;
+  border: 1px solid #ddd;
   position: relative;
 }
 
@@ -336,7 +331,7 @@ body.loading .spinner-wrapper {
   right: 0px;
   background: white;
   border: 1px solid #ddd;
-
+  z-index: 30000;
 }
 
 .search-field-suggestion {
@@ -385,7 +380,7 @@ body.loading .spinner-wrapper {
 #documents .document {
   padding: 20px;
   position: relative;
-  border-bottom: 1px solid #ddd;
+  /*border-bottom: 1px solid #ddd;*/
 }
 
 #documents .document .published-on {
@@ -413,6 +408,11 @@ body.loading .spinner-wrapper {
 
 #documents .document .authors .author {
   margin-right: 10px;
+}
+
+#documents .document .toggle-preview {
+  display: inline-block;
+  padding-top: 10px;
 }
 
 #documents .document .facet-occurence.highlighted {
@@ -455,21 +455,13 @@ body.loading .spinner-wrapper {
 }
 
 .query-string {
-  font-weight: bold;
-  /*background: rgba(234, 231, 35, 0.16);*/
+  /*font-weight: bold;*/
+  background: rgba(234, 231, 35, 0.16);
 }
 
-#documents .document:hover {
-  cursor: pointer;
-  background: #f9f9f9;
-}
-
-#documents .document.active {
+/*#documents .document.active {
   background: #f1f1f1;
-  /*color: #1B6685;*/
-  /*background: rgba(11, 157, 217, 0.6);*/
-  /*border-bottom: 1px solid rgba(11, 157, 217, 0.4);*/
-}
+}*/
 
 
 /* Facets panel

@@ -35,6 +35,8 @@ var BrowserView = function(controller) {
 
   this.facetsEl = $$('#facets');
   this.documentsEl = $$('#documents');
+  this.documentsEl.appendChild($$('.no-result', {text: "Please enter a search term to start"}));
+
   this.previewEl = $$('#preview');
 
   // Loading indicator
@@ -111,24 +113,30 @@ BrowserView.Prototype = function() {
   this.renderPreview = function() {
     var documentId = this.controller.state.documentId;
 
-    this.previewEl.innerHTML = "";
-    this.$('.document').removeClass('active')
+    // this.previewEl.innerHTML = "";
+    // this.$('.document').removeClass('active')
 
     if (documentId) {
-      this.previewView = new PreviewView(this.controller.previewData);
-      this.previewEl.appendChild(this.previewView.render().el);
+      var previewEl = new PreviewView(this.controller.previewData);
+      // this.previewEl.appendChild(this.previewView.render().el);
+
+
+      this.$('.document .preview').remove();
 
       // Highlight previewed document in result list
       this.$('.document').each(function() {
         if (documentId === this.dataset.id) {
-          $(this).addClass('active');
+          // render preview here
+          console.log('meeh', previewEl);
+          console.log(this);
+          this.appendChild(previewEl.render().el);
+          // $(this).addClass('active');
         }
       });
     }
   };
 
   this.renderFacets = function() {
-    console.log('rendering facets...');
     this.facetsView = new FacetsView(this.controller.searchResult.getAvailableFacets());
     this.facetsEl.innerHTML = "";
     this.facetsEl.appendChild(this.facetsView.render().el);
@@ -136,6 +144,8 @@ BrowserView.Prototype = function() {
 
   // Display initial search result
   this.renderSearchResult = function() {
+    var searchStr = this.controller.state.searchQuery.searchStr;
+
     // Check if there's an actual search result
     if (!this.controller.searchResult) return;
 
@@ -146,7 +156,8 @@ BrowserView.Prototype = function() {
 
     // Get filtered documents
     var documents = this.controller.searchResult.getDocuments();
-
+    // console.log('docs', documents);
+    
     if (documents.length > 0) {
       _.each(documents, function(doc, index) {
         var authors = [];
@@ -171,11 +182,15 @@ BrowserView.Prototype = function() {
           children: [
             $$('.published-on', {text: new Date(doc.published_on).toDateString() }),
             $$('.title', {
-              html: doc.title
+              children: [
+                $$('a', {href: "#", html: doc.title})
+              ]
             }),
             $$('.authors', {
               children: authors
             }),
+            $$('a.toggle-preview', {href: "#", html: 'Show matches for "'+searchStr+'" <i class="fa fa-sort-desc"></i>'}),
+            // $$('.preview')
             // $$('.intro', {text: doc.intro}),
             // categoriesEl
           ]

@@ -6,7 +6,8 @@ var $$ = require("substance-application").$$;
 
 var ICON_MAPPING = {
   "subjects": "fa-tags",
-  "article_type": "fa-align-left"
+  "article_type": "fa-align-left",
+  "organisms": "fa-leaf"
 };
 
 // SearchbarView Constructor
