@@ -5,61 +5,27 @@ var _ = require("underscore");
 // 
 // An model abstraction for the search result that the controller can operate on
 
-var AVAILABLE_FACETS = {
-  "article_type": "Article Type",
-  "subjects": "Subjects",
-  "authors": "Authors",
-  "organisms": "Organisms"
-};
+var AVAILABLE_FACETS = require("./available_facets");
 
-var SearchResult = function(res, filters) {
 
-  console.log('new search result is prepared');
-
+var SearchResult = function(res) {
   this.documents = res.documents;
-  this.filteredDocuments = null;
+
+  // Contains searchStr and filters
+  this.searchQuery = res.searchQuery;
+
   this.facets = {}; // extracted facets from the document list
-  this.filters = filters;
 
   this.computeFacets();
-  this.filterDocuments();
 };
 
 SearchResult.Prototype = function() {
-
-  // Take current set filters and determine matching documents
-  // ------------
-
-  this.filterDocuments = function() {
-    this.filteredDocuments = [];
-
-    if (!this.filters || Object.keys(this.filters).length === 0) {
-      this.filteredDocuments = null;
-      return;
-    }
-
-    _.each(this.filters, function(filterValues, filterName) {
-      _.each(filterValues, function(val) {
-        var matches = this.facets[filterName][val];
-        this.filteredDocuments = _.union(this.filteredDocuments, matches);
-      }, this);
-    }, this);
-  };
-
-  // Apply new filters and recompute document list according to filters
-  // ------------
-
-  this.applyFilters = function(newFilters) {
-    this.filters = newFilters;
-    this.filterDocuments();
-  };
-
 
   // Set of documents according to search result and set filters
   // ------------
 
   this.getDocuments = function() {
-    return this.filteredDocuments || this.documents;
+    return this.documents;
   };
 
   // Get current facets
@@ -67,7 +33,7 @@ SearchResult.Prototype = function() {
 
   this.computeFacets = function() {
     // Initialize facets data structure
-    _.each(AVAILABLE_FACETS, function(label, facetName) {
+    _.each(AVAILABLE_FACETS, function(facet, facetName) {
       this.facets[facetName] = {};
     }, this);
 
@@ -75,7 +41,7 @@ SearchResult.Prototype = function() {
     _.each(this.documents, function(doc) {
 
       // Build index for each facet value
-      _.each(AVAILABLE_FACETS, function(label, facetName) {
+      _.each(AVAILABLE_FACETS, function(facet, facetName) {
         var values = doc[facetName];
         if (!_.isArray(values)) values = [values];
 
@@ -93,6 +59,9 @@ SearchResult.Prototype = function() {
         },this);
       }, this);
     }, this);
+
+    console.log('computed facets##################');
+    console.log(this.facets);
   };
 
   // Get available facets
@@ -103,27 +72,68 @@ SearchResult.Prototype = function() {
 
   this.getAvailableFacets = function() {
     var availableFacets = [];
-    _.each(this.facets, function(facet, key) {
-      var richValues = [];
-      var values = Object.keys(facet);
+    var localFacets = this.facets;
 
-      _.each(values, function(val) {
+    _.each(AVAILABLE_FACETS, function(facet, key) {
+      var richValues = [];
+
+      _.each(facet.entries, function(entry) {
+        var computedFacet = localFacets[key];
+
+        var frequency = [entry.name];
+        if (computedFacet[entry.name]) {
+          frequency = computedFacet[entry.name].length;
+        } else {
+          frequency = entry.frequency;
+        }
+
         richValues.push({
-          frequency: facet[val].length,
-          name: val,
-          selected: this.isSelected(key, val)
+          frequency: frequency,
+          name: entry.name,
+          selected: this.isSelected(key, entry.name)
         });
       }, this);
 
-      if (richValues.length > 1) {
-        availableFacets.push({
-          property: key,
-          name: AVAILABLE_FACETS[key],
-          values: richValues
-        });        
-      }
-
+      availableFacets.push({
+        property: key,
+        name: facet.name,
+        entries: richValues
+      });
     }, this);
+
+    // TEMP: Use authors from local result
+    var authorsFacet = this.facets["authors"];
+    var values = Object.keys(authorsFacet);
+    var richValues = [];
+
+    _.each(values, function(val) {
+      richValues.push({
+        frequency: authorsFacet[val].length,
+        name: val,
+        selected: this.isSelected("authors", val)
+      });
+    }, this);
+
+    availableFacets.pop();
+
+    availableFacets.push({
+      property: "authors",
+      name: "Authors",
+      entries: richValues.slice(0, 10)
+    });
+
+    // _.each(this.facets, function(facet, key) {
+    //   var richValues = [];
+    //   var values = Object.keys(facet);
+    //   // if (richValues.length > 1) {
+    //   availableFacets.push({
+    //     property: key,
+    //     name: AVAILABLE_FACETS[key].name,
+    //     entries: richValues
+    //   });        
+    //   // }
+    // }, this);
+
     return availableFacets;
   };
 
@@ -131,12 +141,10 @@ SearchResult.Prototype = function() {
   // ------------
 
   this.isSelected = function(facetName, value) {
-    var filter = this.filters[facetName];
+    var filter = this.searchQuery.filters[facetName];
     if (!filter) return false;
     return filter.indexOf(value) >= 0;
   };
-
-
 };
 
 SearchResult.prototype = new SearchResult.Prototype();

@@ -60,6 +60,10 @@ blockquote, q {
 ---------------------------------
 */
 
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
 body {
 /*  overflow: hidden;
   position: fixed;*/
@@ -101,16 +105,10 @@ a:hover {
 }
 
 .searchbar {
-/*  position: fixed;
-  top: 0px;
-  left: 0px;
-  right: 0px;*/
-
-  background: #eee;
-  border-bottom: 1px solid #ddd;
   height: 60px;
   overflow: visible;
   z-index: 30000;
+  padding: 20px 40px;
 }
 
 #container .panel-wrapper {
@@ -190,18 +188,15 @@ body.loading .spinner-wrapper {
 /* Documents result list */
 
 #facets {
-  /*display: none;*/
   float: right;
-  /*height: 100%;*/
-  width: 30%;
-  /*background: #f7f7f7;*/
-  /*border-right: 1px solid #ddd;*/
+  width: 400px;
+  padding: 20px;
   overflow: auto;
 }
 
 #documents {
-  float: left;
-  width: 70%;
+  /*float: left;*/
+  /*width: 60%;*/
   /*height: 100%;*/
   /*border-right: 1px solid #ddd;*/
 }
@@ -235,35 +230,23 @@ body.loading .spinner-wrapper {
   padding-bottom: 10px;
 }
 
-#preview .authors {
-  padding-bottom: 10px;
-}
-
-#preview .details {
-  font-size: 16px;
-}
-
-#preview .details .links {
-  padding-bottom: 20px;
-}
-
-#preview .details .links a {
-  margin-right: 20px;
-}
-
 /* Fragments container */
 
-#preview .fragments {
+.document .preview .fragments {
 
 }
 
-#preview .fragments .intro {
+.document .preview .fragments .intro {
   color: #888;
   font-size: 16px;
   padding: 20px 0px;
 }
 
-#preview .fragment .links {
+.document .preview .fragment .links {
+  padding-top: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-block;
   padding-top: 10px;
 }
 
@@ -274,12 +257,9 @@ body.loading .spinner-wrapper {
 
 .search-field {
   display: block;
-  float: left;
   border: none;
-  margin-left: 20px;
-  margin-top: 15px;
-  height: 30px;
-  width: 90%;
+  height: 35px;
+
   padding: 0 5px;
   font-size: 13px;
   background: #fff;
@@ -288,38 +268,41 @@ body.loading .spinner-wrapper {
 }
 
 .search-field-filters {
-  height: 30px;
+  position: absolute;
+  right: 60px;
+  top: 0px;
+  bottom: 0px;
+
+  /*height: 30px;*/
   padding: 5px;
-  /*background: blue;*/
-  float: left;
+  /*float: right;*/
   overflow: hidden;
+  /*padding-right: 55px;*/
 }
 
 .search-field-filter {
   float: left;
-  background: #ddd;
-  border-radius: 2px;
-  /*color: white;*/
-
-  padding: 0px 5px;
-  margin-right: 2px;
-  
+  font-style: italic;
+  color: #777;
+  font-size: 12px;
+  margin-right: 5px;
   height: 20px;
   line-height: 20px;
 }
 
 .search-field-filter a {
-  color: #505050;
+  font-weight: 600;
+  font-style: normal;
 }
 
 .search-field-input {
-  margin-top: 5px;
+  display: block;
+  font-weight: 600;
+  min-height: 33px;
+  padding-left: 10px;
   font-family: 'Source Sans Pro', Helvetica, Arial, Verdana, sans-serif;
-  /*background: #ccc;*/
-  height: 20px;
-  width: 400px;
-  font-size: 16px;
-  line-height: 20px;
+  width: 100%;
+  font-size: 18px;
   border: none;
 }
 
@@ -347,12 +330,16 @@ body.loading .spinner-wrapper {
 }
 
 .searchbar .search-button {
-  margin-top: 15px;
   display: block;
-  float: left;
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  bottom: -1px;
+  font-weight: 600;
+  /*margin-top: 15px;*/
+  
   background: #4A90E2;
-  height: 30px;
-  line-height: 30px;
+  line-height: 35px;
   padding: 0px 10px;
   color: #fff;
 }
@@ -368,6 +355,7 @@ body.loading .spinner-wrapper {
 #documents {
   position: relative;
   overflow: auto;
+  padding: 20px;
 }
 
 #documents .no-result {
@@ -411,13 +399,26 @@ body.loading .spinner-wrapper {
 }
 
 #documents .document .toggle-preview {
+  font-size: 13px;
+  font-weight: 600;
   display: inline-block;
   padding-top: 10px;
+}
+#documents .document .filters {
+  padding: 10px 0px;
+  overflow: auto;
+}
+
+#documents .document .filter {
+  float: left;
+  font-style: italic;
+  font-size: 14px;
+  margin-right: 10px;
+  background: rgba(234, 231, 35, 0.16);
 }
 
 #documents .document .facet-occurence.highlighted {
   background: #444;
-  /*border-bottom: 3px solid #4A90E2;*/
   color: white;
 }
 
@@ -493,21 +494,34 @@ body.loading .spinner-wrapper {
 }
 
 #facets .facet .facet-values .value.selected {
-  background: #444;
-  color: white;
-  border-radius: 2px;
+  /*background: #444;*/
+  /*color: white;*/
+  /*border-radius: 2px;*/
 }
 
 /* article type */
 #facets .facet.article_type .facet-values .value.selected {
-  background: #249fd7;
-  color: white;
+  /*background: #249fd7;*/
+  /*color: white;*/
 }
 
 /* subjects */
 
 #facets .facet.subjects .facet-values .value.selected {
-  background: #659e47;
-  color: white;
+  /*background: #659e47;*/
+  /*color: white;*/
 }
 
+
+
+/* Mobile (iPad Portrait, iPhone) */
+@media (max-width: 900px) {
+  #facets {
+    display: none;
+  }
+
+  /*Hide search field filters */
+  .search-field-filters {
+    display: none;
+  }
+}

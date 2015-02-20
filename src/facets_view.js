@@ -30,7 +30,6 @@ FacetsView.Prototype = function() {
   this.renderFacets = function() {
     this.availableFacets = $$('.available-facets');
     
-
     // Render facets
     _.each(this.facets, function(facet) {
       var facetEl = $$('.facet.'+facet.property);
@@ -40,12 +39,19 @@ FacetsView.Prototype = function() {
       var facetValuesEl = $$('.facet-values');
 
       // Filter values + frequency in doc corpus
-      _.each(facet.values, function(facetValue) {
-        var facetValueEl = $$('a.value'+(facetValue.selected ? '.selected' : ''), {
+      _.each(facet.entries, function(facetEntry) {
+        var icon;
+        if (facetEntry.selected) {
+          icon = 'fa-check-square-o';
+        } else {
+          icon = 'fa-square-o';
+        }
+
+        var facetValueEl = $$('a.value'+(facetEntry.selected ? '.selected' : ''), {
           href: "#",
           "data-facet": facet.property,
-          "data-value": facetValue.name,
-          text: facetValue.name + " ("+facetValue.frequency+")"
+          "data-value": facetEntry.name,
+          html: '<i class="fa '+icon+'"></i> ' + facetEntry.name + ' ('+facetEntry.frequency+')'
         });
 
         facetValuesEl.appendChild(facetValueEl);
@@ -56,7 +62,6 @@ FacetsView.Prototype = function() {
     }, this);
     
     this.el.appendChild(this.availableFacets);
-    // this.highlightFacets();
   };
 
 

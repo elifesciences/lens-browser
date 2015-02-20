@@ -28,6 +28,25 @@ SearchQuery.Prototype = function() {
     this.trigger("query:changed");
   };
 
+  this.clearFilters = function() {
+    this.filters = {};
+    this.trigger("query:changed");
+  };
+
+  this.hasFilter = function(facet, value) {
+    var values = this.filters[facet];
+    if (!values) return false;
+    return values.indexOf(value) >= 0;
+  };
+
+  this.toggleFilter = function(facet, value) {
+    if (this.hasFilter(facet, value)) {
+      this.removeFilter(facet, value);
+    } else {
+      this.addFilter(facet, value);
+    }
+  };
+
   this.removeLastFilter = function() {
     console.log('TODO: Implement.');
   };

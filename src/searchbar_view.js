@@ -34,14 +34,19 @@ var SearchbarView = function(searchQuery, options) {
   this.searchFieldInputEl = $$('input.search-field-input', {type: "text", placeholder: "Search or add filters"});
   this.searchFieldEl.appendChild(this.searchFieldInputEl);
 
+  this.searchButton = $$('a.search-button' , {href: "#", text: 'Search'});
+  this.searchFieldEl.appendChild(this.searchButton);
+
   // Suggestions
   this.searchFieldSuggestionsEl = $$('.search-field-suggestions');
+  $(this.searchFieldSuggestionsEl).hide();
+
   this.searchFieldEl.appendChild(this.searchFieldSuggestionsEl);
 
   // Search button
   this.el.appendChild(this.searchFieldEl);
-  this.searchButton = $$('a.search-button' , {href: "#", text: 'Search'});
-  this.el.appendChild(this.searchButton);
+  
+
 
   // Event handlers
   // ------------
@@ -57,6 +62,7 @@ var SearchbarView = function(searchQuery, options) {
   this.$el.on('click', '.search-field-suggestion', _.bind(this._addFilter, this));
 
   this.$el.on('click', '.remove-filter', _.bind(this._removeFilter, this));
+  this.$el.on('click', '.clear-filters', _.bind(this._clearFilters, this));
 
   $(this.searchFieldInputEl).change(_.bind(this._updateSearchStr, this));
 
@@ -78,6 +84,11 @@ SearchbarView.Prototype = function() {
     var facet = $(e.currentTarget).attr("data-facet");
     var filterVal = $(e.currentTarget).attr("data-value");
     this.searchQuery.removeFilter(facet, filterVal);
+  };
+
+  this._clearFilters = function(e) {
+    e.preventDefault();
+    this.searchQuery.clearFilters();
   };
 
   // Event handlers
@@ -110,26 +121,8 @@ SearchbarView.Prototype = function() {
 
     // ignore keyup/keydown/enter
     if (_.include([40, 38, 13],e.keyCode)) return;
-
     this.renderSuggestions(searchStr);
   };
-
-  // this.setSearchData = function(data) {
-  //   this.controller.searchstr = data.searchstr;
-  //   if (data.searchFilters) {
-  //     this.controller.filters = data.searchFilters;
-  //     this.renderFilters();
-  //   }
-
-  //   $(this.searchFieldInputEl).val(this.controller.searchstr);
-  // };
-
-  // this.getSearchData = function() {
-  //   return {
-  //     searchStr: $(this.searchFieldInputEl).val(),
-  //     filters: this.controller.getFilters()
-  //   }
-  // };
 
   // Delay a bit so click handlers can be triggered on suggested elements
   this._hideSuggestions = function(e) {
@@ -169,7 +162,6 @@ SearchbarView.Prototype = function() {
   //
 
   this.render = function() {
-    console.log('rendering searchbar view');
     this.updateView();
     return this;
   };
@@ -179,14 +171,35 @@ SearchbarView.Prototype = function() {
 
   this.renderFilters = function() {
     this.searchFieldFilters.innerHTML = "";
+
+    // var prefix = $$('.search-field-filter', {text: "in"});
+    // this.searchFieldFilters.appendChild(prefix);
+
+
+    var filterCount = 0;
     _.each(this.searchQuery.filters, function(filterValues, facet) {
       _.each(filterValues, function(filterVal) {
         var filterEl = $$('.search-field-filter', {
-          html: '<i class="fa '+ICON_MAPPING[facet]+'"></i> '+ filterVal +' <a href="#" class="remove-filter" data-facet="'+facet+'" data-value="'+filterVal+'"><i class="fa fa-remove"></i></a>'
+          html: filterVal // +' <a href="#" class="remove-filter" data-facet="'+facet+'" data-value="'+filterVal+'"><i class="fa fa-remove"></i></a>'
         });
-        this.searchFieldFilters.appendChild(filterEl);
+        if (filterCount<3) {
+          this.searchFieldFilters.appendChild(filterEl);  
+        }
+        filterCount += 1;
       }, this);
     }, this);
+
+    if (filterCount>3) {
+      var andMoreEl = $$('.search-field-filter', {text: "and "+(filterCount-3)+" more"});
+      this.searchFieldFilters.appendChild(andMoreEl);
+    }
+
+    if (filterCount>0) {
+      var clearFiltersEl = $$('.search-field-filter', {
+        children: [$$('a.clear-filters', {href: "#", text: "Clear Filters"})]
+      });
+      this.searchFieldFilters.appendChild(clearFiltersEl);      
+    }
   };
 
   // Update the current view according to new data
@@ -238,6 +251,7 @@ SearchbarView.Prototype = function() {
   // ------------------
 
   this.renderSuggestions = function(searchStr) {
+    return; // disable suggestions
     var suggestions = this.options.getSuggestions(searchStr);
     
     this.searchFieldSuggestionsEl.innerHTML = "";

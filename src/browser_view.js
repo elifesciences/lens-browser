@@ -7,6 +7,7 @@ var SearchbarView = require("./searchbar_view");
 var PreviewView = require("./preview_view");
 var FacetsView = require("./facets_view");
 
+
 // Browser.View Constructor
 // ========
 //
@@ -56,7 +57,7 @@ var BrowserView = function(controller) {
   // $(this.searchFieldEl).change(_.bind(this.startSearch, this));
 
   this.$el.on('click', '.available-facets .value', _.bind(this.toggleFilter, this));
-  this.$el.on('click', '.document', _.bind(this.togglePreview, this));
+  this.$el.on('click', '.document .toggle-preview', _.bind(this.togglePreview, this));
 
   // Should this work on the controller?
   // this.searchbarView.on('search:changed', _.bind(this.startSearch, this));
@@ -66,7 +67,7 @@ BrowserView.Prototype = function() {
 
   this.togglePreview = function(e) {
     e.preventDefault();
-    var documentId = $(e.currentTarget).attr('data-id');
+    var documentId = $(e.currentTarget).parent().attr('data-id');
     this.controller.openPreview(documentId);
   };
 
@@ -75,18 +76,19 @@ BrowserView.Prototype = function() {
     var facet = $(e.currentTarget).attr("data-facet");
     var facetValue = $(e.currentTarget).attr("data-value");
 
-    console.log('toggling', facet, facetValue);
-    this.controller.searchQuery.addFilter(facet, facetValue);
+    // console.log('toggling', facet, facetValue);
+
+    this.controller.searchQuery.toggleFilter(facet, facetValue);
   };
 
   // Show the loading indicator
   this.showLoading = function() {
-    $(this.loadingEl).show();
+    // $(this.loadingEl).show();
   };
 
   // Hide the loading indicator
   this.hideLoading = function() {
-    $(this.loadingEl).hide();
+    // $(this.loadingEl).hide();
   };
 
   // Rendering
@@ -113,24 +115,14 @@ BrowserView.Prototype = function() {
   this.renderPreview = function() {
     var documentId = this.controller.state.documentId;
 
-    // this.previewEl.innerHTML = "";
-    // this.$('.document').removeClass('active')
-
     if (documentId) {
       var previewEl = new PreviewView(this.controller.previewData);
-      // this.previewEl.appendChild(this.previewView.render().el);
-
-
-      this.$('.document .preview').remove();
 
       // Highlight previewed document in result list
       this.$('.document').each(function() {
         if (documentId === this.dataset.id) {
           // render preview here
-          console.log('meeh', previewEl);
-          console.log(this);
           this.appendChild(previewEl.render().el);
-          // $(this).addClass('active');
         }
       });
     }
@@ -145,6 +137,7 @@ BrowserView.Prototype = function() {
   // Display initial search result
   this.renderSearchResult = function() {
     var searchStr = this.controller.state.searchQuery.searchStr;
+    var filters = this.controller.state.searchQuery.filters;
 
     // Check if there's an actual search result
     if (!this.controller.searchResult) return;
@@ -156,7 +149,6 @@ BrowserView.Prototype = function() {
 
     // Get filtered documents
     var documents = this.controller.searchResult.getDocuments();
-    // console.log('docs', documents);
     
     if (documents.length > 0) {
       _.each(documents, function(doc, index) {
@@ -177,33 +169,53 @@ BrowserView.Prototype = function() {
         //   categoriesEl.appendChild(subjectEl);
         // }, this);
 
+        var filtersEl = $$('.filters');
+        _.each(filters, function(filterVals, key) {
+          // console.log('filter', f);
+          var docVals = doc[key];
+          if (!_.isArray(docVals)) docVals = [docVals];
+
+          _.each(filterVals, function(filterVal) {
+            if (_.include(docVals, filterVal)) {
+              var filterEl = $$('.filter', {text: filterVal});
+              filtersEl.appendChild(filterEl);
+            }
+          });
+          // if (doc[key])
+        });
+
+
         var documentEl = $$('.document', {
           "data-id": doc.id,
           children: [
             $$('.published-on', {text: new Date(doc.published_on).toDateString() }),
             $$('.title', {
               children: [
-                $$('a', {href: "#", html: doc.title})
+                $$('a', {href: doc.url, target: "_blank", html: doc.title})
               ]
             }),
             $$('.authors', {
               children: authors
             }),
-            $$('a.toggle-preview', {href: "#", html: 'Show matches for "'+searchStr+'" <i class="fa fa-sort-desc"></i>'}),
-            // $$('.preview')
-            // $$('.intro', {text: doc.intro}),
-            // categoriesEl
+            filtersEl
           ]
         });
+
+        // TODO: replace this with check doc.matches_count > 0
+        if (searchStr) {
+          var togglePreviewEl = $$('a.toggle-preview', {href: "#", html: '<i class="fa fa-align-left"></i> Show matches for "'+searchStr+'"'});
+          documentEl.appendChild(togglePreviewEl);
+        }
 
         this.documentsEl.appendChild(documentEl);
       }, this);
 
-      this.renderFacets();
     } else {
       // Render no search result
       this.documentsEl.appendChild($$('.no-result', {text: "Your search did not match any documents"}));
     }
+
+    this.renderFacets();
   };
 
   this.render = function() {

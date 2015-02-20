@@ -8,6 +8,8 @@ var BrowserView = require("./browser_view");
 var SearchQuery = require("./search_query");
 var SearchResult = require("./search_result");
 
+var AVAILABLE_FACETS = require("./available_facets");
+
 // Used to initialize the SearchQuery model
 var EMPTY_QUERY = {
   searchStr: "",
@@ -19,53 +21,6 @@ var EXAMPLE_QUERY = {
   filters: {
     "subjects": ["Neuroscience"],
     "article_type": ["Research article"]
-  }
-};
-
-var AVAILABLE_SUGGESTIONS = {
-  "subjects": {
-    "name": "Subjects",
-    "entries": [
-      {"name": "Biochemistry", "frequency": 4},
-      {"name": "Biophysics and structural biology", "frequency": 4},
-      {"name": "Cancer biology", "frequency": 4},
-      {"name": "Cell biology", "frequency": 4},
-      {"name": "Computational and systems biology", "frequency": 4},
-      {"name": "Developmental biology and stem cells", "frequency": 4},
-      {"name": "Ecology", "frequency": 4},
-      {"name": "Epidemiology and global health", "frequency": 4},
-      {"name": "Genes and chromosomes", "frequency": 4},
-      {"name": "Genomics and evolutionary biology", "frequency": 4},
-      {"name": "Human biology and medicine", "frequency": 4},
-      {"name": "Immunology", "frequency": 4},
-      {"name": "Microbiology and infectious disease", "frequency": 4},
-      {"name": "Neuroscience", "frequency": 4},
-      {"name": "Plant biology", "frequency": 4}
-    ]
-  },
-  "article_type": {
-    "name": "Content Type",
-    "entries": [
-      {"name": "Editorial", "frequency": 4},
-      {"name": "Feature article", "frequency": 4},
-      {"name": "Insight", "frequency": 4},
-      {"name": "Research article", "frequency": 4},
-      {"name": "Short report", "frequency": 4},
-      {"name": "Research advance", "frequency": 4},
-      {"name": "Registered report", "frequency": 4},
-      {"name": "Correction", "frequency": 4}
-    ]
-  },
-  "organisms": {
-    "name": "Research organism",
-    "entries": [
-      {"name": "Mouse", "frequency": 4},
-      {"name": "Human", "frequency": 4}
-    ]
-  },
-  "authors": {
-    "name": "Author",
-    "entries": []
   }
 };
 
@@ -103,7 +58,6 @@ BrowserController.Prototype = function() {
     });
   };
 
-  // this.controller.openPreview(documentId);
   this.openPreview = function(documentId) {
     this.switchState({
       id: "main",
@@ -116,7 +70,7 @@ BrowserController.Prototype = function() {
   // SearchbarView needs this
   this.getSuggestions = function(searchStr) {
     var suggestions = [];
-    var combinedFacets = JSON.parse(JSON.stringify(AVAILABLE_SUGGESTIONS));
+    var combinedFacets = JSON.parse(JSON.stringify(AVAILABLE_FACETS));
 
     if (this.searchResult) {
       var searchResultFacets = {};
@@ -126,7 +80,7 @@ BrowserController.Prototype = function() {
       _.each(availableFacets, function(facet) {
         searchResultFacets[facet.property] = {
           name: facet.name,
-          entries: facet.values
+          entries: facet.entries
         }
       });
 
@@ -135,11 +89,8 @@ BrowserController.Prototype = function() {
           combinedFacets[facetKey].entries = _.union(combinedFacets[facetKey].entries, searchResultFacets[facetKey].entries);
         }
       });
-
-      console.log('avail facets', combinedFacets);
     };
 
-    // searchStr = "mou";
     if (!searchStr) return [];
 
     _.each(combinedFacets, function(facet, facetKey) {
@@ -155,7 +106,7 @@ BrowserController.Prototype = function() {
       });
     });
 
-    console.log('Suggs', suggestions);
+    // console.log('Suggs', suggestions);
     // only return MAX_SUGGESTIONS
     return suggestions;
   };
@@ -190,10 +141,11 @@ BrowserController.Prototype = function() {
           query= JSON.parse(JSON.stringify(newState.searchQuery));
         } else {
           query = EMPTY_QUERY;
+          newState.searchQuery = query;
         }
         this.searchQuery.setQuery(query);
       }
-
+      // debugger;
       if (!_.isEqual(newState.searchQuery, this.state.searchQuery)) {
         // Search query has changed
         this.loadSearchResult(newState, cb);
@@ -256,12 +208,20 @@ BrowserController.Prototype = function() {
       url: this.config.api_url+"/search?searchQuery="+encodeURIComponent(JSON.stringify(searchQuery)),
       dataType: 'json',
       success: function(matchingDocs) {
+
+        console.log('MATCHINGDOCS', matchingDocs);
+
+        // Patching docs
+        _.each(matchingDocs, function(doc) {
+          var elifeID = _.last(doc.id.split("."));
+          doc.url = "http://lens.elifesciences.org/" + elifeID;
+        }, this);
+
         // TODO: this structure should be provided on the server
         self.searchResult = new SearchResult({
-          query: newState.searchstr,
+          searchQuery: searchQuery,
           documents: matchingDocs
         }, {});
-
 
         self.getSuggestions();
         if (documentId) {
