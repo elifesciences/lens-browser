@@ -196,7 +196,7 @@ BrowserView.Prototype = function() {
 
         // TODO: replace this with check doc.matches_count > 0
         if (searchStr) {
-          var togglePreviewEl = $$('a.toggle-preview', {href: "#", html: '<i class="fa fa-align-left"></i> Show matches for "'+searchStr+'"'});
+          var togglePreviewEl = $$('a.toggle-preview', {href: "#", html: '<i class="fa fa-eye"></i> Show matches for "'+searchStr+'"'});
           documentEl.appendChild(togglePreviewEl);
         }
 

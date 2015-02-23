@@ -208,13 +208,39 @@ body.loading .spinner-wrapper {
 
 .document .preview {
   font-size: 14px;
-  padding: 20px;
+  margin-top: 20px;
+  padding: 0 20px;
+
   line-height: 20px;
-  margin-left: 30px;
+  margin-left: 20px;
+  border-left: 1px solid #ddd;
 }
 
 .document .preview .fragment {
   padding-bottom: 20px;
+  position: relative;
+}
+
+.document .preview .fragment .separator {
+  position: absolute;
+  top: 10px;
+  left: -21px;
+  bottom: 0px;
+  width: 10px;
+
+  border-top: 1px solid #ddd;
+  /*border-left: 1px solid #ddd;*/
+}
+
+.document .preview .fragment .links a {
+  font-weight: 600;
+}
+
+.document .preview .fragment:last-child .separator {
+  /*border-left: 1px solid red;*/
+}
+.document .preview .fragment:last-child {
+  padding-bottom: 0px;
 }
 
 .document .preview .published-on {

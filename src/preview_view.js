@@ -31,18 +31,18 @@ PreviewView.Prototype = function() {
   };
 
   this.renderPreview = function() {
-    this.el.innerHTML = "";
-  
+    this.el.innerHTML = "";  
     var fragmentsEl = $$('.fragments');
 
     if (this.model.fragments.length > 0) {
       var fragmentsIntroEl = $$('.intro', {html: this.model.fragments.length+' matches for "'+this.model.searchStr+'"'});
-      fragmentsEl.appendChild(fragmentsIntroEl);      
+      fragmentsEl.appendChild(fragmentsIntroEl);
     }
 
     _.each(this.model.fragments, function(fragment) {
       fragmentsEl.appendChild($$('.fragment', {
         children: [
+          $$('.separator'),
           $$('.content', {html: fragment.content}),
           $$('.links', {
             children: [
