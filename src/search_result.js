@@ -13,9 +13,7 @@ var SearchResult = function(res) {
 
   // Contains searchStr and filters
   this.searchQuery = res.searchQuery;
-
   this.facets = {}; // extracted facets from the document list
-
   this.computeFacets();
 };
 
@@ -59,9 +57,6 @@ SearchResult.Prototype = function() {
         },this);
       }, this);
     }, this);
-
-    console.log('computed facets##################');
-    console.log(this.facets);
   };
 
   // Get available facets
@@ -121,18 +116,6 @@ SearchResult.Prototype = function() {
       name: "Authors",
       entries: richValues.slice(0, 10)
     });
-
-    // _.each(this.facets, function(facet, key) {
-    //   var richValues = [];
-    //   var values = Object.keys(facet);
-    //   // if (richValues.length > 1) {
-    //   availableFacets.push({
-    //     property: key,
-    //     name: AVAILABLE_FACETS[key].name,
-    //     entries: richValues
-    //   });        
-    //   // }
-    // }, this);
 
     return availableFacets;
   };

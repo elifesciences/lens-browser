@@ -64,7 +64,6 @@ FacetsView.Prototype = function() {
     this.el.appendChild(this.availableFacets);
   };
 
-
   this.dispose = function() {
     this.stopListening();
   };

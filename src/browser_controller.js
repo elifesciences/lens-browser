@@ -225,7 +225,7 @@ BrowserController.Prototype = function() {
 
         // TODO: this structure should be provided on the server
         self.searchResult = new SearchResult({
-          searchQuery: searchQuery,
+          searchQuery: self.searchQuery,
           documents: matchingDocs
         }, {});
 
@@ -233,7 +233,7 @@ BrowserController.Prototype = function() {
           self.loadPreview(documentId, searchQuery.searchStr, cb);
         } else {
           self.previewData = null;
-          cb(null);          
+          cb(null);
         }
       },
       error: function(err) {

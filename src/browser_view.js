@@ -61,6 +61,8 @@ var BrowserView = function(controller) {
 
   // Should this work on the controller?
   // this.searchbarView.on('search:changed', _.bind(this.startSearch, this));
+
+  // Each time the search query changes we re-render the facets panel
   this.controller.searchQuery.on('query:changed', _.bind(this.renderFacets, this));
 };
 
@@ -76,8 +78,6 @@ BrowserView.Prototype = function() {
     e.preventDefault();
     var facet = $(e.currentTarget).attr("data-facet");
     var facetValue = $(e.currentTarget).attr("data-value");
-
-    // console.log('toggling', facet, facetValue);
 
     this.controller.searchQuery.toggleFilter(facet, facetValue);
   };
@@ -129,9 +129,9 @@ BrowserView.Prototype = function() {
     }
   };
 
-
   this.renderFacets = function() {
     console.log('rendering facets...');
+
     this.facetsView = new FacetsView(this.controller.searchResult.getAvailableFacets());
     this.facetsEl.innerHTML = "";
     this.facetsEl.appendChild(this.facetsView.render().el);
@@ -162,19 +162,11 @@ BrowserView.Prototype = function() {
           authors.push(authorEl);
         }, this);
 
-        // var categoriesEl = $$('.categories');
-        // var articleTypeEl = $$('.article_type.facet-occurence', {text: doc.article_type });
-        // categoriesEl.appendChild(articleTypeEl);
-
-        // // Iterate over subjects and display
-        // _.each(doc.subjects, function(subject) {
-        //   var subjectEl = $$('.subjects.facet-occurence', {text: subject});
-        //   categoriesEl.appendChild(subjectEl);
-        // }, this);
+        // Matching filters
+        // --------------
 
         var filtersEl = $$('.filters');
         _.each(filters, function(filterVals, key) {
-          // console.log('filter', f);
           var docVals = doc[key];
           if (!_.isArray(docVals)) docVals = [docVals];
 
@@ -184,9 +176,7 @@ BrowserView.Prototype = function() {
               filtersEl.appendChild(filterEl);
             }
           });
-          // if (doc[key])
         });
-
 
         var documentEl = $$('.document', {
           "data-id": doc.id,
@@ -194,7 +184,7 @@ BrowserView.Prototype = function() {
             $$('.published-on', {text: new Date(doc.published_on).toDateString() }),
             $$('.title', {
               children: [
-                $$('a', {href: doc.url, target: "_blank", html: doc.title})
+                $$('a', { href: doc.url, target: "_blank", html: doc.title })
               ]
             }),
             $$('.authors', {
@@ -222,7 +212,6 @@ BrowserView.Prototype = function() {
   };
 
   this.render = function() {
-    console.log('BrowserView#render');
     this.el.innerHTML = "";
     this.el.appendChild(this.searchbarView.render().el);
     this.el.appendChild(this.panelWrapperEl);

@@ -272,12 +272,7 @@ body.loading .spinner-wrapper {
   right: 60px;
   top: 0px;
   bottom: 0px;
-
-  /*height: 30px;*/
-  padding: 5px;
-  /*float: right;*/
   overflow: hidden;
-  /*padding-right: 55px;*/
 }
 
 .search-field-filter {
@@ -286,8 +281,7 @@ body.loading .spinner-wrapper {
   color: #777;
   font-size: 12px;
   margin-right: 5px;
-  height: 20px;
-  line-height: 20px;
+  line-height: 33px;
 }
 
 .search-field-filter a {
@@ -309,9 +303,10 @@ body.loading .spinner-wrapper {
 /* Suggestions */
 .search-field-suggestions {
   position: absolute;
-  top: 30px;
-  left: 0px;
-  right: 0px;
+  top: 33px;
+  left: -1px;
+  right: 400px;
+
   background: white;
   border: 1px solid #ddd;
   z-index: 30000;
@@ -368,7 +363,6 @@ body.loading .spinner-wrapper {
 #documents .document {
   padding: 20px;
   position: relative;
-  /*border-bottom: 1px solid #ddd;*/
 }
 
 #documents .document .published-on {
@@ -379,7 +373,6 @@ body.loading .spinner-wrapper {
 #documents .document .title {
   display: block;
   font-weight: 600;
-  /*margin-right: 130px;*/
   font-size: 20px;
   line-height: 26px;
   padding-bottom: 5px;

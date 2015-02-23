@@ -32,7 +32,6 @@ PreviewView.Prototype = function() {
 
   this.renderPreview = function() {
     this.el.innerHTML = "";
-
   
     var fragmentsEl = $$('.fragments');
 
