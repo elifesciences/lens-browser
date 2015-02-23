@@ -61,6 +61,7 @@ var BrowserView = function(controller) {
 
   // Should this work on the controller?
   // this.searchbarView.on('search:changed', _.bind(this.startSearch, this));
+  this.controller.searchQuery.on('query:changed', _.bind(this.renderFacets, this));
 };
 
 BrowserView.Prototype = function() {
@@ -128,7 +129,9 @@ BrowserView.Prototype = function() {
     }
   };
 
+
   this.renderFacets = function() {
+    console.log('rendering facets...');
     this.facetsView = new FacetsView(this.controller.searchResult.getAvailableFacets());
     this.facetsEl.innerHTML = "";
     this.facetsEl.appendChild(this.facetsView.render().el);

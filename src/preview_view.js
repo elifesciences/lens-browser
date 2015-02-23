@@ -33,32 +33,6 @@ PreviewView.Prototype = function() {
   this.renderPreview = function() {
     this.el.innerHTML = "";
 
-    // Details container
-    // var detailsEl = $$('.details');
-
-    // var publishDateEl = $$('.published-on', {
-    //   html: new Date(this.model.document.published_on).toDateString()
-    // });
-
-    // detailsEl.appendChild(publishDateEl);
-
-    // var titleEl = $$('.title', {
-    //   html: this.model.document.title
-    // });
-
-    // detailsEl.appendChild(titleEl);
-    // var authorsEl = $$('.authors', {html: this.model.document.authors.join(', ') });
-    // detailsEl.appendChild(authorsEl);
-
-    // var linksEl = $$('.links', {
-    //   children: [
-    //     $$('a', {href: this.model.document.url, html: '<i class="fa fa-external-link-square"></i> Open in Lens', target: '_blank'}),
-    //     $$('a', {href: this.model.document.pdf_url, html: '<i class="fa fa-file-pdf-o"></i> PDF', target: '_blank'})
-    //   ]
-    // });
-
-    // detailsEl.appendChild(linksEl);
-    // this.el.appendChild(detailsEl);
   
     var fragmentsEl = $$('.fragments');
 

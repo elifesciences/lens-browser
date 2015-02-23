@@ -9,19 +9,12 @@ var SearchQuery = require("./search_query");
 var SearchResult = require("./search_result");
 
 var AVAILABLE_FACETS = require("./available_facets");
+var AVAILABLE_KEYWORDS = require("./available_keywords");
 
 // Used to initialize the SearchQuery model
 var EMPTY_QUERY = {
   searchStr: "",
   filters: {}
-};
-
-var EXAMPLE_QUERY = {
-  searchStr: "mouse",
-  filters: {
-    "subjects": ["Neuroscience"],
-    "article_type": ["Research article"]
-  }
 };
 
 // BrowserController
@@ -66,50 +59,65 @@ BrowserController.Prototype = function() {
     });
   };
 
-  // Available search suggestions
-  // SearchbarView needs this
+
   this.getSuggestions = function(searchStr) {
     var suggestions = [];
-    var combinedFacets = JSON.parse(JSON.stringify(AVAILABLE_FACETS));
-
-    if (this.searchResult) {
-      var searchResultFacets = {};
-      var availableFacets = this.searchResult.getAvailableFacets();
-
-      // build facet index
-      _.each(availableFacets, function(facet) {
-        searchResultFacets[facet.property] = {
-          name: facet.name,
-          entries: facet.entries
-        }
-      });
-
-      _.each(combinedFacets, function(facet, facetKey) {
-        if (searchResultFacets[facetKey]) {
-          combinedFacets[facetKey].entries = _.union(combinedFacets[facetKey].entries, searchResultFacets[facetKey].entries);
-        }
-      });
-    };
-
-    if (!searchStr) return [];
-
-    _.each(combinedFacets, function(facet, facetKey) {
-      _.each(facet.entries, function(entry) {
-        if (entry.name.toLowerCase().match(searchStr.toLowerCase())) {
-          suggestions.push({
-            value: entry.name.replace(searchStr, "<b>"+searchStr+"</b>"),
-            rawValue: entry.name,
-            facet: facetKey,
-            facetName: facet.name
-          });
-        }
-      });
+    _.each(AVAILABLE_KEYWORDS, function(keyword) {
+      if (keyword.toLowerCase().match(searchStr.toLowerCase())) {
+        suggestions.push({
+          value: keyword.replace(searchStr, "<b>"+searchStr+"</b>"),
+          rawValue: keyword
+        });
+      }
     });
 
-    // console.log('Suggs', suggestions);
-    // only return MAX_SUGGESTIONS
     return suggestions;
   };
+
+  // Available search suggestions
+  // SearchbarView needs this
+  // this.getSuggestions = function(searchStr) {
+  //   var suggestions = [];
+  //   var combinedFacets = JSON.parse(JSON.stringify(AVAILABLE_FACETS));
+
+  //   if (this.searchResult) {
+  //     var searchResultFacets = {};
+  //     var availableFacets = this.searchResult.getAvailableFacets();
+
+  //     // build facet index
+  //     _.each(availableFacets, function(facet) {
+  //       searchResultFacets[facet.property] = {
+  //         name: facet.name,
+  //         entries: facet.entries
+  //       }
+  //     });
+
+  //     _.each(combinedFacets, function(facet, facetKey) {
+  //       if (searchResultFacets[facetKey]) {
+  //         combinedFacets[facetKey].entries = _.union(combinedFacets[facetKey].entries, searchResultFacets[facetKey].entries);
+  //       }
+  //     });
+  //   };
+
+  //   if (!searchStr) return [];
+
+  //   _.each(combinedFacets, function(facet, facetKey) {
+  //     _.each(facet.entries, function(entry) {
+  //       if (entry.name.toLowerCase().match(searchStr.toLowerCase())) {
+  //         suggestions.push({
+  //           value: entry.name.replace(searchStr, "<b>"+searchStr+"</b>"),
+  //           rawValue: entry.name,
+  //           facet: facetKey,
+  //           facetName: facet.name
+  //         });
+  //       }
+  //     });
+  //   });
+
+  //   // console.log('Suggs', suggestions);
+  //   // only return MAX_SUGGESTIONS
+  //   return suggestions;
+  // };
 
   this.createView = function() {
     if (!this.view) {
@@ -209,8 +217,6 @@ BrowserController.Prototype = function() {
       dataType: 'json',
       success: function(matchingDocs) {
 
-        console.log('MATCHINGDOCS', matchingDocs);
-
         // Patching docs
         _.each(matchingDocs, function(doc) {
           var elifeID = _.last(doc.id.split("."));
@@ -223,7 +229,6 @@ BrowserController.Prototype = function() {
           documents: matchingDocs
         }, {});
 
-        self.getSuggestions();
         if (documentId) {
           self.loadPreview(documentId, searchQuery.searchStr, cb);
         } else {

@@ -46,20 +46,16 @@ var SearchbarView = function(searchQuery, options) {
   // Search button
   this.el.appendChild(this.searchFieldEl);
   
-
-
   // Event handlers
   // ------------
 
   $(this.searchFieldInputEl).keyup(_.bind(this._updateSuggestions, this));
-  
   $(this.searchFieldInputEl).keydown(_.bind(this._interpretKey, this));
   // $(this.searchFieldInputEl).focus(_.bind(this._updateSuggestions, this));
-
   // $(this.searchFieldInputEl).blur(_.bind(this._hideSuggestions, this));
 
   $(this.el).click(_.bind(this._hideSuggestions, this));
-  this.$el.on('click', '.search-field-suggestion', _.bind(this._addFilter, this));
+  this.$el.on('click', '.search-field-suggestion', _.bind(this._useKeyword, this));
 
   this.$el.on('click', '.remove-filter', _.bind(this._removeFilter, this));
   this.$el.on('click', '.clear-filters', _.bind(this._clearFilters, this));
@@ -72,7 +68,7 @@ var SearchbarView = function(searchQuery, options) {
 SearchbarView.Prototype = function() {
 
   this._updateSearchStr = function(e) {
-    var searchStr = $(e.currentTarget).val();
+    var searchStr = $(this.searchFieldInputEl).val();
     this.searchQuery.updateSearchStr(searchStr);
 
     e.preventDefault();
@@ -98,7 +94,7 @@ SearchbarView.Prototype = function() {
   this._interpretKey = function(e) {
     var searchStr = $(e.currentTarget).val();
     if (e.keyCode === 8 && searchStr === "") {
-      this.searchQuery.removeLastFilter();
+      // this.searchQuery.removeLastFilter();
       // this.renderFilters();
     } else {
       if (e.keyCode === 40) {
@@ -110,7 +106,6 @@ SearchbarView.Prototype = function() {
         this.prevSuggestion();
         e.preventDefault();
       } else if (e.keyCode === 13) {
-        console.log('choose suggestion');
         this.chooseSuggestion();
       }
     }
@@ -134,15 +129,17 @@ SearchbarView.Prototype = function() {
     }, 200, this);
   };
 
-  this._addFilter = function(e) {
+  this._useKeyword = function(e) {
     var $el = $(e.currentTarget);
-    var facet = $el.attr('data-facet');
+    // var facet = $el.attr('data-facet');
     var value = $el.attr('data-value');
 
-    this.searchQuery.addFilter(facet, value);
+    // this.searchQuery.addFilter(facet, value);
     this._hideSuggestions();
     // reset searchfield
-    $(this.searchFieldInputEl).val('').focus();
+    $(this.searchFieldInputEl).val(value).focus();
+
+    this._updateSearchStr(e);
     e.preventDefault();
   };
 
@@ -174,7 +171,6 @@ SearchbarView.Prototype = function() {
 
     // var prefix = $$('.search-field-filter', {text: "in"});
     // this.searchFieldFilters.appendChild(prefix);
-
 
     var filterCount = 0;
     _.each(this.searchQuery.filters, function(filterValues, facet) {
@@ -251,9 +247,13 @@ SearchbarView.Prototype = function() {
   // ------------------
 
   this.renderSuggestions = function(searchStr) {
-    return; // disable suggestions
     var suggestions = this.options.getSuggestions(searchStr);
     
+    if (suggestions.length === 0) {
+      $(this.searchFieldSuggestionsEl).hide();
+      return;
+    }
+
     this.searchFieldSuggestionsEl.innerHTML = "";
     _.each(suggestions, function(suggestion) {
       var suggestionEl = $$('a.search-field-suggestion', {
