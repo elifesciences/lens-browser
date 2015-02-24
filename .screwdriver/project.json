@@ -3,7 +3,7 @@
     {
       "repository": "https://github.com/substance/application.git",
       "folder": "node_modules/substance-application",
-      "branch": "master"
+      "branch": "json-in-app-states"
     },
     {
       "repository": "https://github.com/substance/data.git",
