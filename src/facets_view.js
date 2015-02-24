@@ -47,11 +47,17 @@ FacetsView.Prototype = function() {
           icon = 'fa-square-o';
         }
 
+
+        var label = facetEntry.name;
+        if (facetEntry.frequency > 0) {
+          label += ' ('+facetEntry.frequency+')';
+        }
+
         var facetValueEl = $$('a.value'+(facetEntry.selected ? '.selected' : ''), {
           href: "#",
           "data-facet": facet.property,
           "data-value": facetEntry.name,
-          html: '<i class="fa '+icon+'"></i> ' + facetEntry.name + ' ('+facetEntry.frequency+')'
+          html: '<i class="fa '+icon+'"></i> ' + label
         });
 
         facetValuesEl.appendChild(facetValueEl);

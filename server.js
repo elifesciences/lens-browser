@@ -33,7 +33,7 @@ new CJSServer(app, __dirname, 'lens')
   })
   // ... the same applies to the css file
   .styles(config.styles, 'lens.css')
-  .page('/index.html');
+  .page('/', './index.html');
 
 // Serve assets with alias as configured in project.json (~dist like setup)
 _.each(config.assets, function(srcPath, distPath) {

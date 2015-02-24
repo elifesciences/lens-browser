@@ -36,19 +36,19 @@ var BrowserView = function(controller) {
 
   this.facetsEl = $$('#facets');
   this.documentsEl = $$('#documents');
-  this.documentsEl.appendChild($$('.no-result', {text: "Please enter a search term to start"}));
+  this.documentsEl.appendChild($$('.no-result', {text: "Loading documents ..."}));
 
   this.previewEl = $$('#preview');
 
   // Loading indicator
-  this.loadingEl = $$('.loading', {html: '<div class="spinner-wrapper"><div class="spinner"></div><div class="message">Loading documents</div></div>'});
+  // this.loadingEl = $$('.loading', {html: '<div class="spinner-wrapper"><div class="spinner"></div><div class="message">Loading documents</div></div>'});
 
   // Wrap what we have into a panel wrapper
   this.panelWrapperEl = $$('.panel-wrapper');
   this.panelWrapperEl.appendChild(this.facetsEl);
   this.panelWrapperEl.appendChild(this.documentsEl);
   this.panelWrapperEl.appendChild(this.previewEl);
-  this.panelWrapperEl.appendChild(this.loadingEl);
+  
 
   // Event handlers
   // ------------
@@ -84,12 +84,24 @@ BrowserView.Prototype = function() {
 
   // Show the loading indicator
   this.showLoading = function() {
-    // $(this.loadingEl).show();
+    $('.progress-bar').removeClass('done loading').show();
+    _.delay(function() {
+      // $('.spinner').hide();
+      $('.progress-bar').addClass('loading');
+    }, 10);
+
   };
 
   // Hide the loading indicator
   this.hideLoading = function() {
-    // $(this.loadingEl).hide();
+    $(this.loadingEl).hide();
+    // $('.progress-bar').removeClass('loading');
+    $('.progress-bar').addClass('done');
+
+    _.delay(function() {
+      $('.progress-bar').hide();
+    }, 1000);
+    
   };
 
   // Rendering
@@ -105,10 +117,11 @@ BrowserView.Prototype = function() {
       if (!_.isEqual(newState.searchQuery, oldState.searchQuery)) {
         this.renderSearchResult();
         this.renderPreview();
+        this.hideLoading();
         // TODO: update facets view
       } else if (newState.documentId && newState.documentId !== oldState.documentId) {
-        console.log('render preview now', this.controller.previewData);
         this.renderPreview();
+        this.hideLoading();
       }
     }
   };
@@ -147,8 +160,6 @@ BrowserView.Prototype = function() {
 
     this.documentsEl.innerHTML = "";
 
-    // Hide loading indicator
-    this.hideLoading();
 
     // Get filtered documents
     var documents = this.controller.searchResult.getDocuments();

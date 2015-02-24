@@ -178,6 +178,8 @@ BrowserController.Prototype = function() {
 
   this.loadPreview = function(documentId, searchStr, cb) {
     // Get filters from app state
+
+    this.view.showLoading();
     var self = this;
 
     $.ajax({
@@ -229,12 +231,16 @@ BrowserController.Prototype = function() {
           documents: matchingDocs
         }, {});
 
-        if (documentId) {
-          self.loadPreview(documentId, searchQuery.searchStr, cb);
-        } else {
-          self.previewData = null;
-          cb(null);
-        }
+        _.delay( function() {
+          if (documentId) {
+            self.loadPreview(documentId, searchQuery.searchStr, cb);
+          } else {
+            self.previewData = null;
+            cb(null);
+          }
+        }, 1000);
+
+
       },
       error: function(err) {
         console.error(err.responseText);

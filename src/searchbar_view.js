@@ -27,6 +27,15 @@ var SearchbarView = function(searchQuery, options) {
   this.$el.addClass('searchbar');
   this.searchFieldEl = $$('.search-field');
   
+
+
+  // Loading spinner
+  this.loaderEl = $$('.progress-bar', {
+    html: '<div class="progress loading"></div>'
+  });
+
+  this.searchFieldEl.appendChild(this.loaderEl);
+
   // Filters
   this.searchFieldFilters = $$('.search-field-filters');
   this.searchFieldEl.appendChild(this.searchFieldFilters);
