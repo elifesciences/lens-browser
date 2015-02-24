@@ -68,6 +68,8 @@ FacetsView.Prototype = function() {
     }, this);
     
     this.el.appendChild(this.availableFacets);
+
+    this.$('.facet.authors .facet-values').append($('<a class="show-more" href="#">Show 20 more</a>'));
   };
 
   this.dispose = function() {

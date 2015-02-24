@@ -28,14 +28,6 @@ var SearchbarView = function(searchQuery, options) {
   this.searchFieldEl = $$('.search-field');
   
 
-
-  // Loading spinner
-  this.loaderEl = $$('.progress-bar', {
-    html: '<div class="progress loading"></div>'
-  });
-
-  this.searchFieldEl.appendChild(this.loaderEl);
-
   // Filters
   this.searchFieldFilters = $$('.search-field-filters');
   this.searchFieldEl.appendChild(this.searchFieldFilters);
@@ -61,7 +53,7 @@ var SearchbarView = function(searchQuery, options) {
   $(this.searchFieldInputEl).keyup(_.bind(this._updateSuggestions, this));
   $(this.searchFieldInputEl).keydown(_.bind(this._interpretKey, this));
   // $(this.searchFieldInputEl).focus(_.bind(this._updateSuggestions, this));
-  // $(this.searchFieldInputEl).blur(_.bind(this._hideSuggestions, this));
+  $(this.searchFieldInputEl).blur(_.bind(this._hideSuggestions, this));
 
   $(this.el).click(_.bind(this._hideSuggestions, this));
   this.$el.on('click', '.search-field-suggestion', _.bind(this._useKeyword, this));

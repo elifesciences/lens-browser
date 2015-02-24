@@ -482,6 +482,15 @@ div {
   color: #444;
 }
 
+/* DELETE soon */
+#facets .facet .facet-values a {
+  display: inline-block;
+  font-size: 13px;
+  padding-top: 10px;
+  padding: 4px 5px;
+}
+
+
 
 /* Mobile (iPad Portrait, iPhone) */
 @media (max-width: 900px) {

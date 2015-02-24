@@ -38,8 +38,6 @@ var BrowserView = function(controller) {
 
   this.previewEl = $$('#preview');
 
-  // Loading indicator
-  // this.loadingEl = $$('.loading', {html: '<div class="spinner-wrapper"><div class="spinner"></div><div class="message">Loading documents</div></div>'});
 
   // Wrap what we have into a panel wrapper
   this.panelWrapperEl = $$('.panel-wrapper');
@@ -47,24 +45,28 @@ var BrowserView = function(controller) {
   this.panelWrapperEl.appendChild(this.documentsEl);
   this.panelWrapperEl.appendChild(this.previewEl);
   
+  // Loading spinner
+  this.progressbarEl = $$('.progress-bar', {
+    html: '<div class="progress loading"></div>'
+  });
 
   // Event handlers
   // ------------
 
-  // $(this.searchButton).click(_.bind(this.startSearch, this));
-  // $(this.searchFieldEl).change(_.bind(this.startSearch, this));
-
   this.$el.on('click', '.available-facets .value', _.bind(this.toggleFilter, this));
   this.$el.on('click', '.document .toggle-preview', _.bind(this.togglePreview, this));
 
-  // Should this work on the controller?
-  // this.searchbarView.on('search:changed', _.bind(this.startSearch, this));
+  this.$el.on('click', '.show-more', _.bind(this._preventDefault, this));
 
   // Each time the search query changes we re-render the facets panel
   this.controller.searchQuery.on('query:changed', _.bind(this.renderFacets, this));
 };
 
 BrowserView.Prototype = function() {
+
+  this._preventDefault = function(e) {
+    e.preventDefault();
+  };
 
   this.togglePreview = function(e) {
     e.preventDefault();
@@ -164,6 +166,9 @@ BrowserView.Prototype = function() {
     var documents = this.controller.searchResult.getDocuments();
     
     if (documents.length > 0) {
+
+      this.documentsEl.appendChild($$('.no-result', {text: documents.length + " articles found"}));
+
       _.each(documents, function(doc, index) {
         var authors = [];
 
@@ -225,6 +230,7 @@ BrowserView.Prototype = function() {
     this.el.innerHTML = "";
     this.el.appendChild(this.searchbarView.render().el);
     this.el.appendChild(this.panelWrapperEl);
+    this.el.appendChild(this.progressbarEl);
     return this;
   };
 
