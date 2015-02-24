@@ -37,6 +37,9 @@ PreviewView.Prototype = function() {
     if (this.model.fragments.length > 0) {
       var fragmentsIntroEl = $$('.intro', {html: this.model.fragments.length+' matches for "'+this.model.searchStr+'"'});
       fragmentsEl.appendChild(fragmentsIntroEl);
+    } else {
+      var fragmentsIntroEl = $$('.intro', {html: 'No matches found'});
+      fragmentsEl.appendChild(fragmentsIntroEl);
     }
 
     _.each(this.model.fragments, function(fragment) {

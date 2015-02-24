@@ -51,15 +51,6 @@ BrowserController.Prototype = function() {
     });
   };
 
-  this.openPreview = function(documentId) {
-    this.switchState({
-      id: "main",
-      searchQuery: this.searchQuery.toJSON(),
-      documentId: documentId
-    });
-  };
-
-
   this.getSuggestions = function(searchStr) {
     var suggestions = [];
     _.each(AVAILABLE_KEYWORDS, function(keyword) {
@@ -73,51 +64,6 @@ BrowserController.Prototype = function() {
 
     return suggestions;
   };
-
-  // Available search suggestions
-  // SearchbarView needs this
-  // this.getSuggestions = function(searchStr) {
-  //   var suggestions = [];
-  //   var combinedFacets = JSON.parse(JSON.stringify(AVAILABLE_FACETS));
-
-  //   if (this.searchResult) {
-  //     var searchResultFacets = {};
-  //     var availableFacets = this.searchResult.getAvailableFacets();
-
-  //     // build facet index
-  //     _.each(availableFacets, function(facet) {
-  //       searchResultFacets[facet.property] = {
-  //         name: facet.name,
-  //         entries: facet.entries
-  //       }
-  //     });
-
-  //     _.each(combinedFacets, function(facet, facetKey) {
-  //       if (searchResultFacets[facetKey]) {
-  //         combinedFacets[facetKey].entries = _.union(combinedFacets[facetKey].entries, searchResultFacets[facetKey].entries);
-  //       }
-  //     });
-  //   };
-
-  //   if (!searchStr) return [];
-
-  //   _.each(combinedFacets, function(facet, facetKey) {
-  //     _.each(facet.entries, function(entry) {
-  //       if (entry.name.toLowerCase().match(searchStr.toLowerCase())) {
-  //         suggestions.push({
-  //           value: entry.name.replace(searchStr, "<b>"+searchStr+"</b>"),
-  //           rawValue: entry.name,
-  //           facet: facetKey,
-  //           facetName: facet.name
-  //         });
-  //       }
-  //     });
-  //   });
-
-  //   // console.log('Suggs', suggestions);
-  //   // only return MAX_SUGGESTIONS
-  //   return suggestions;
-  // };
 
   this.createView = function() {
     if (!this.view) {
@@ -153,16 +99,11 @@ BrowserController.Prototype = function() {
         }
         this.searchQuery.setQuery(query);
       }
-      // debugger;
       if (!_.isEqual(newState.searchQuery, this.state.searchQuery)) {
         // Search query has changed
         this.loadSearchResult(newState, cb);
-      } else if (newState.documentId && newState.documentId !== this.state.documentId) {
-        // Selected document has been changed
-        this.loadPreview(newState.documentId, newState.searchQuery.searchStr, cb);
       } else {
         console.log('no state change detected, skipping', this.state, newState);
-        // cb(null);
         return cb(null, {skip: true});
       }
     } else {
@@ -177,9 +118,6 @@ BrowserController.Prototype = function() {
   // 
 
   this.loadPreview = function(documentId, searchStr, cb) {
-    // Get filters from app state
-
-    this.view.showLoading();
     var self = this;
 
     $.ajax({
@@ -231,15 +169,9 @@ BrowserController.Prototype = function() {
           documents: matchingDocs
         }, {});
 
-        _.delay( function() {
-          if (documentId) {
-            self.loadPreview(documentId, searchQuery.searchStr, cb);
-          } else {
-            self.previewData = null;
-            cb(null);
-          }
-        }, 1000);
 
+        self.previewData = null;
+        cb(null);
 
       },
       error: function(err) {

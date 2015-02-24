@@ -28,8 +28,6 @@ var BrowserView = function(controller) {
     getSuggestions: _.bind(this.controller.getSuggestions, this.controller)
   });
 
-  // TODO: create PreviewView
-
   // List of found documents
   // ------------
   // 
@@ -70,15 +68,28 @@ BrowserView.Prototype = function() {
 
   this.togglePreview = function(e) {
     e.preventDefault();
-    var documentId = $(e.currentTarget).parent().attr('data-id');
-    this.controller.openPreview(documentId);
+
+    var searchQuery = this.controller.searchQuery;
+    var $documentEl = $(e.currentTarget).parent();
+    var documentId = $documentEl.attr('data-id');
+    var self = this;
+
+    var $preview = $documentEl.find('.preview');
+    if ($preview.length > 0) {
+      $preview.toggle();
+    } else {
+      this.showLoading();
+      this.controller.loadPreview(documentId, searchQuery.searchStr, function(err) {
+        self.renderPreview();
+        self.hideLoading();
+      });
+    }
   };
 
   this.toggleFilter = function(e) {
     e.preventDefault();
     var facet = $(e.currentTarget).attr("data-facet");
     var facetValue = $(e.currentTarget).attr("data-value");
-
     this.controller.searchQuery.toggleFilter(facet, facetValue);
   };
 
@@ -86,22 +97,18 @@ BrowserView.Prototype = function() {
   this.showLoading = function() {
     $('.progress-bar').removeClass('done loading').show();
     _.delay(function() {
-      // $('.spinner').hide();
       $('.progress-bar').addClass('loading');
     }, 10);
-
   };
 
   // Hide the loading indicator
   this.hideLoading = function() {
     $(this.loadingEl).hide();
-    // $('.progress-bar').removeClass('loading');
     $('.progress-bar').addClass('done');
 
     _.delay(function() {
       $('.progress-bar').hide();
     }, 1000);
-    
   };
 
   // Rendering
@@ -116,26 +123,21 @@ BrowserView.Prototype = function() {
     if (newState.id === "main") {
       if (!_.isEqual(newState.searchQuery, oldState.searchQuery)) {
         this.renderSearchResult();
-        this.renderPreview();
-        this.hideLoading();
-        // TODO: update facets view
-      } else if (newState.documentId && newState.documentId !== oldState.documentId) {
-        this.renderPreview();
         this.hideLoading();
       }
     }
   };
 
   this.renderPreview = function() {
-    var documentId = this.controller.state.documentId;
+    var previewData = this.controller.previewData;
+    var documentId = previewData.document.id;
 
-    if (documentId) {
-      var previewEl = new PreviewView(this.controller.previewData);
+    if (this.controller.previewData) {
+      var previewEl = new PreviewView(previewData);
 
       // Highlight previewed document in result list
       this.$('.document').each(function() {
         if (documentId === this.dataset.id) {
-          // render preview here
           this.appendChild(previewEl.render().el);
         }
       });
@@ -143,8 +145,6 @@ BrowserView.Prototype = function() {
   };
 
   this.renderFacets = function() {
-    console.log('rendering facets...');
-
     this.facetsView = new FacetsView(this.controller.searchResult.getAvailableFacets());
     this.facetsEl.innerHTML = "";
     this.facetsEl.appendChild(this.facetsView.render().el);
@@ -159,7 +159,6 @@ BrowserView.Prototype = function() {
     if (!this.controller.searchResult) return;
 
     this.documentsEl.innerHTML = "";
-
 
     // Get filtered documents
     var documents = this.controller.searchResult.getDocuments();
