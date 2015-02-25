@@ -92,10 +92,10 @@ BrowserController.Prototype = function() {
 
         var query;
         if (newState.searchQuery) {
-          query= JSON.parse(JSON.stringify(newState.searchQuery));
+          query = JSON.parse(JSON.stringify(newState.searchQuery));
         } else {
           query = EMPTY_QUERY;
-          newState.searchQuery = query;
+          newState.searchQuery = JSON.parse(JSON.stringify(query));
         }
         this.searchQuery.setQuery(query);
       }
