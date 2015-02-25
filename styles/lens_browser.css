@@ -295,7 +295,7 @@ div {
 .search-field-input {
   display: block;
   font-weight: 600;
-  min-height: 33px;
+  min-height: 32px;
   padding-left: 3px;
   font-family: 'Source Sans Pro', Helvetica, Arial, Verdana, sans-serif;
   width: 100%;
