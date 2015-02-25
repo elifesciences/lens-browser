@@ -250,7 +250,7 @@ div {
   border: none;
   height: 35px;
 
-  padding: 0 5px;
+  /*padding: 0 5px;*/
   font-size: 13px;
   background: #fff;
   border: 1px solid #ddd;
@@ -295,8 +295,9 @@ div {
 .search-field-input {
   display: block;
   font-weight: 600;
-  min-height: 32px;
-  padding-left: 3px;
+  height: 33px;
+  border-radius: 0px;
+  padding-left: 5px;
   font-family: 'Source Sans Pro', Helvetica, Arial, Verdana, sans-serif;
   width: 100%;
   font-size: 18px;
@@ -489,8 +490,6 @@ div {
   padding-top: 10px;
   padding: 4px 5px;
 }
-
-
 
 /* Mobile (iPad Portrait, iPhone) */
 @media (max-width: 900px) {
