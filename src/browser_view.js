@@ -147,7 +147,7 @@ BrowserView.Prototype = function() {
   };
 
   this.renderFacets = function() {
-    this.facetsView = new FacetsView(this.controller.searchResult.getAvailableFacets());
+    this.facetsView = new FacetsView(this.controller.searchResult.getFacets());
     this.facetsEl.innerHTML = "";
     this.facetsEl.appendChild(this.facetsView.render().el);
   };
@@ -164,10 +164,11 @@ BrowserView.Prototype = function() {
 
     // Get filtered documents
     var documents = this.controller.searchResult.getDocuments();
+    var searchMetrics = this.controller.searchResult.getSearchMetrics();
     
     if (documents.length > 0) {
 
-      this.documentsEl.appendChild($$('.no-result', {text: documents.length + " articles found"}));
+      this.documentsEl.appendChild($$('.no-result', {text: searchMetrics.hits + " articles found"}));
 
       _.each(documents, function(doc, index) {
         var authors = [];

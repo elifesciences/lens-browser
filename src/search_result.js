@@ -7,117 +7,91 @@ var _ = require("underscore");
 
 var AVAILABLE_FACETS = require("./available_facets");
 
+var LABEL_MAPPING = {
+  subjects: "Subjects",
+  article_type: "Article Type",
+  organisms: "Organisms",
+  authors: "Top Authors"
+};
 
-var SearchResult = function(res) {
-  this.documents = res.documents;
-
-  // Contains searchStr and filters
-  this.searchQuery = res.searchQuery;
-  this.facets = {}; // extracted facets from the document list
-  this.computeFacets();
+var SearchResult = function(data) {
+  this.rawResult = data.result;
+  this.searchQuery = data.searchQuery;
 };
 
 SearchResult.Prototype = function() {
+
+  this.getSearchMetrics = function() {
+    return {
+      hits: this.rawResult.hits.total
+    };
+  };
 
   // Set of documents according to search result and set filters
   // ------------
 
   this.getDocuments = function() {
-    return this.documents;
+    var documents = [];
+    _.each(this.rawResult.hits.hits, function(rawDoc) {
+      var doc = JSON.parse(JSON.stringify(rawDoc._source));
+      documents.push(_.extend(doc, {
+        id: rawDoc._id,
+        _score: rawDoc._score,
+        title: rawDoc.highlight && rawDoc.highlight.title ? rawDoc.highlight.title[0] : rawDoc._source.title
+      }));
+    });
+    return documents;
   };
 
-  // Get current facets
-  // ------------
+  this.getScopedFrequency = function(facet, value) {
+    var facet = this.rawResult.aggregations[facet];
 
-  this.computeFacets = function() {
-    // Initialize facets data structure
-    _.each(AVAILABLE_FACETS, function(facet, facetName) {
-      this.facets[facetName] = {};
-    }, this);
-
-    // Iterate over all docs from result set
-    _.each(this.documents, function(doc) {
-
-      // Build index for each facet value
-      _.each(AVAILABLE_FACETS, function(facet, facetName) {
-        var values = doc[facetName];
-        if (!_.isArray(values)) values = [values];
-
-        // Track each facet value and maintain reference to documents that have that value
-        _.each(values, function(val) {
-          var facet = this.facets[facetName];
-
-          if (facet[val]) {
-            // Push to existing entry
-            facet[val].push(doc);
-          } else {
-            // Create new entry
-            facet[val] = [ doc ];
-          }
-        },this);
-      }, this);
-    }, this);
-  };
-
-  // Get available facets
-  // ------------
-  // 
-  // More verbose representation of all available facets
-  // used by the browser view
-
-  this.getAvailableFacets = function() {
-    var availableFacets = [];
-    var localFacets = this.facets;
-
-    _.each(AVAILABLE_FACETS, function(facet, key) {
-      var richValues = [];
-
-      _.each(facet.entries, function(entry) {
-        var computedFacet = localFacets[key];
-
-        var frequency = [entry.name];
-        if (computedFacet[entry.name]) {
-          frequency = computedFacet[entry.name].length;
-        } else {
-          frequency = entry.frequency;
-        }
-
-        richValues.push({
-          frequency: frequency,
-          name: entry.name,
-          selected: this.isSelected(key, entry.name)
-        });
-      }, this);
-
-      availableFacets.push({
-        property: key,
-        name: facet.name,
-        entries: richValues
-      });
-    }, this);
-
-    // TEMP: Use authors from local result
-    var authorsFacet = this.facets["authors"];
-    var values = Object.keys(authorsFacet);
-    var richValues = [];
-
-    _.each(values, function(val) {
-      richValues.push({
-        frequency: authorsFacet[val].length,
-        name: val,
-        selected: this.isSelected("authors", val)
-      });
-    }, this);
-
-    availableFacets.pop();
-
-    availableFacets.push({
-      property: "authors",
-      name: "Authors",
-      entries: richValues.slice(0, 10)
+    if (!facet) return "0";
+    var bucket = _.select(facet.buckets, function(bucket) {
+      return bucket.key === value;
     });
 
-    return availableFacets;
+    return bucket.length > 0 ? bucket[0].doc_count : "0";
+  };
+
+  this.getFacets = function() {
+    var facets = [];
+    var self = this;
+    var aggregations = this.rawResult.aggregations;
+
+    // console.log(JSON.stringify(this.rawResult.aggregations, null, "  "));
+
+    _.each(LABEL_MAPPING, function(label, property) {
+      var entries = [];
+
+      if (AVAILABLE_FACETS[property]) {
+        _.each(AVAILABLE_FACETS[property].buckets, function(bucket) {
+          entries.push({
+            name: bucket.key,
+            frequency: bucket.doc_count,
+            scoped_frequency: self.getScopedFrequency(property, bucket.key),
+            selected: self.isSelected(property, bucket.key)
+          });
+        });
+      } else if (property === "authors") {
+        _.each(aggregations["authors"].buckets, function(bucket) {
+          entries.push({
+            name: bucket.key,
+            frequency: bucket.doc_count,
+            scoped_frequency: self.getScopedFrequency(property, bucket.key),
+            selected: self.isSelected(property, bucket.key)
+          });
+        });
+      }
+
+      facets.push({
+        name: label,
+        property: property,
+        entries: entries
+      });
+    });
+
+    return facets;
   };
 
   // Returns true when a given facet value is set as a filter

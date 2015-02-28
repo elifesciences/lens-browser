@@ -155,24 +155,24 @@ BrowserController.Prototype = function() {
     $.ajax({
       url: this.config.api_url+"/search?searchQuery="+encodeURIComponent(JSON.stringify(searchQuery)),
       dataType: 'json',
-      success: function(matchingDocs) {
+      success: function(result) {
+
+        console.log('search result:', result);
+        // console.log(JSON.stringify(result.aggregations, null, "  "));
 
         // Patching docs
-        _.each(matchingDocs, function(doc) {
-          var elifeID = _.last(doc.id.split("."));
-          doc.url = "http://lens.elifesciences.org/" + elifeID;
+        _.each(result.hits.hits, function(doc) {
+          var elifeID = _.last(doc._id.split("."));
+          doc._source.url = "http://lens.elifesciences.org/" + elifeID;
         }, this);
 
-        // TODO: this structure should be provided on the server
         self.searchResult = new SearchResult({
           searchQuery: self.searchQuery,
-          documents: matchingDocs
+          result: result
         }, {});
-
 
         self.previewData = null;
         cb(null);
-
       },
       error: function(err) {
         console.error(err.responseText);
