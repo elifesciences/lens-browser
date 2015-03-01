@@ -182,18 +182,6 @@ var AVAILABLE_FACETS = {
         "doc_count": 5
       },
       {
-        "key": "Reproducibility Project: Cancer Biology",
-        "doc_count": 5
-      },
-      {
-        "key": "Werner Kühlbrandt",
-        "doc_count": 5
-      },
-      {
-        "key": "Alejandro Sánchez Alvarado",
-        "doc_count": 4
-      },
-      {
         "key": "Alma L Burlingame",
         "doc_count": 4
       },
