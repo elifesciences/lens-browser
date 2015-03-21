@@ -34,24 +34,24 @@ PreviewView.Prototype = function() {
     this.el.innerHTML = "";  
     var fragmentsEl = $$('.fragments');
 
-    if (this.model.fragments.length > 0) {
-      var fragmentsIntroEl = $$('.intro', {html: this.model.fragments.length+' matches for "'+this.model.searchStr+'"'});
-      fragmentsEl.appendChild(fragmentsIntroEl);
-    } else {
-      var fragmentsIntroEl = $$('.intro', {html: 'No matches found'});
-      fragmentsEl.appendChild(fragmentsIntroEl);
-    }
+    // if (this.model.fragments.length > 0) {
+    //   var fragmentsIntroEl = $$('.intro', {html: this.model.fragments.length+' matches for "'+this.model.searchStr+'"'});
+    //   fragmentsEl.appendChild(fragmentsIntroEl);
+    // } else {
+    //   var fragmentsIntroEl = $$('.intro', {html: 'No matches found'});
+    //   fragmentsEl.appendChild(fragmentsIntroEl);
+    // }
 
     _.each(this.model.fragments, function(fragment) {
       fragmentsEl.appendChild($$('.fragment', {
         children: [
           $$('.separator'),
           $$('.content', {html: fragment.content}),
-          $$('.links', {
-            children: [
-              $$('a', { href: this.model.document.url+"#content/"+fragment.id, html: '<i class="fa fa-external-link-square"></i> Read more', target: '_blank' })
-            ]
-          })
+          // $$('.links', {
+          //   children: [
+          //     $$('a', { href: this.model.document.url+"#content/"+fragment.id, html: '<i class="fa fa-external-link-square"></i> Read more', target: '_blank' })
+          //   ]
+          // })
         ]
       }));
     }, this);

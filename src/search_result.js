@@ -36,8 +36,12 @@ SearchResult.Prototype = function() {
       var doc = JSON.parse(JSON.stringify(rawDoc._source));
       documents.push(_.extend(doc, {
         id: rawDoc._id,
+        fragments: rawDoc.fragments,
         _score: rawDoc._score,
-        title: rawDoc.highlight && rawDoc.highlight.title ? rawDoc.highlight.title[0] : rawDoc._source.title
+        title: rawDoc.highlight && rawDoc.highlight.title ? rawDoc.highlight.title[0] : rawDoc._source.title,
+        authors_string: rawDoc.highlight && rawDoc.highlight.authors_string ? rawDoc.highlight.authors_string[0] : rawDoc._source.authors_string,
+        intro: rawDoc.highlight && rawDoc.highlight.intro ? rawDoc.highlight.intro[0] : rawDoc._source.intro,
+        doi: rawDoc.highlight && rawDoc.highlight.doi ? rawDoc.highlight.doi[0] : rawDoc._source.doi,
       }));
     });
     return documents;

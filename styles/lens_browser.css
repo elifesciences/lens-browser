@@ -65,13 +65,6 @@ html {
 }
 
 body {
-/*  overflow: hidden;
-  position: fixed;*/
-/*  left: 0px;
-  right: 0px;
-  top: 0px;
-  bottom: 0px;*/
-
   font-family: 'Source Sans Pro', Helvetica, Arial, Verdana, sans-serif;
   color: #505050;  
 }
@@ -94,16 +87,6 @@ a:hover {
 ---------------------------------
 */
 
-#container {
-/*  position: absolute;
-  top: 0px;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
-  overflow: hidden;*/
-  /*height: 100%;*/
-}
-
 .searchbar {
   overflow: visible;
   z-index: 30000;
@@ -114,11 +97,6 @@ a:hover {
 }
 
 #container .panel-wrapper {
-  /*position: absolute;*/
-/*  top: 60px;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;*/
   overflow: auto;
 }
 
@@ -177,7 +155,7 @@ div {
 
 .document .preview {
   font-size: 14px;
-  margin-top: 20px;
+  margin-top: 15px;
   padding: 0 20px;
 
   line-height: 20px;
@@ -205,19 +183,6 @@ div {
 
 .document .preview .fragment:last-child {
   padding-bottom: 0px;
-}
-
-.document .preview .published-on {
-  color: #888;
-  padding-bottom: 5px;
-}
-
-.document .preview .title {
-  color: rgba(0,0,0,0.8);
-  font-weight: 600;
-  font-size: 20px;
-  line-height: 25px;
-  padding-bottom: 10px;
 }
 
 /* Fragments container */
@@ -369,8 +334,40 @@ div {
   position: relative;
 }
 
-#documents .document .published-on {
+#documents .document .meta-info {
+  overflow: auto;
   color: #888;
+  font-style: italic;
+  font-size: 14px;
+}
+
+#documents .document .meta-info > div {
+  float: left;
+  /*display: inline-block;*/
+  margin-right: 20px;
+}
+
+#documents .document .meta-info .article-type {
+  font-style: normal;
+  color: #273b81;
+}
+
+/* Various colors for different article types */
+
+#documents .document .meta-info .article-type.feature-article {
+  color: #cf0c4e;
+}
+
+#documents .document .meta-info .article-type.insight {
+  color: #629f43;
+}
+
+#documents .document .meta-info .article-type.editorial {
+  color: #0961ab;
+}
+
+
+#documents .document .published-on {
   padding-bottom: 5px;
 }
 
@@ -403,6 +400,7 @@ div {
 }
 #documents .document .filters {
   padding: 10px 0px;
+  padding-bottom: 3px;
   overflow: auto;
 }
 
@@ -431,9 +429,11 @@ div {
 }
 
 #documents .document .intro {
-  padding-top: 10px;
   font-style: italic;
   color: rgba(0,0,0,0.6);
+  padding-bottom: 10px;
+  line-height: 20px;
+  font-size: 14px;
 }
 
 #documents .document .categories {
@@ -482,7 +482,7 @@ div {
   margin-bottom: 1px;
   padding: 4px 5px;
   font-size: 13px;
-  color: #666;
+  color: #444;
   position: relative;
 }
 

@@ -45,6 +45,8 @@ BrowserController.Prototype = function() {
 
   this.startSearch = function() {
     // console.log('query changed', this.searchQuery);
+    ga('send', 'event', 'search:'+this.searchQuery.searchStr, 'search', 'search');
+
     this.switchState({
       id: "main",
       searchQuery: this.searchQuery.toJSON()

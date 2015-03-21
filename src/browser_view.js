@@ -8,6 +8,18 @@ var PreviewView = require("./preview_view");
 var FacetsView = require("./facets_view");
 
 
+var ARTICLE_TYPES = {
+  "Research article": "research-article",
+  "Feature article": "feature-article",
+  "Insight": "insight",
+  "Correction": "correction",
+  "Short report": "short-report",
+  "Editorial": "editorial",
+  "Research advance": "research-advance",
+  "Registered report": "registered-report",
+};
+
+
 // Browser.View Constructor
 // ========
 //
@@ -76,6 +88,8 @@ BrowserView.Prototype = function() {
     var documentId = $documentEl.attr('data-id');
     var self = this;
 
+    ga('send', 'event', 'preview', 'click', 'preview');
+
     var $preview = $documentEl.find('.preview');
     if ($preview.length > 0) {
       $preview.toggle();
@@ -92,6 +106,9 @@ BrowserView.Prototype = function() {
     e.preventDefault();
     var facet = $(e.currentTarget).attr("data-facet");
     var facetValue = $(e.currentTarget).attr("data-value");
+
+    ga('send', 'event', 'filter:'+facet+':'+facetValue, 'click', 'filters');
+
     this.controller.searchQuery.toggleFilter(facet, facetValue);
   };
 
@@ -173,10 +190,10 @@ BrowserView.Prototype = function() {
       _.each(documents, function(doc, index) {
         var authors = [];
 
-        _.each(doc.authors, function(author) {
-          var authorEl = $$('span.author.facet-occurence', {text: author});
-          authors.push(authorEl);
-        }, this);
+        // _.each(doc.authors, function(author) {
+        //   var authorEl = $$('span.author.facet-occurence', {text: author});
+        //   authors.push(authorEl);
+        // }, this);
 
         // Matching filters
         // --------------
@@ -194,27 +211,65 @@ BrowserView.Prototype = function() {
           });
         });
 
+
+        var elems = [
+          $$('.meta-info', {
+            children: [
+              $$('.article-type.'+ARTICLE_TYPES[doc.article_type], {html: doc.article_type+" "}),
+              $$('.doi', {html: doc.doi+" "}),
+              $$('.published-on', {text: "published on "+ new Date(doc.published_on).toDateString()})
+            ]
+          }),
+          $$('.title', {
+            children: [
+              $$('a', { href: doc.url, target: "_blank", html: doc.title })
+            ]
+          }),
+        ];
+
+        if (doc.intro) {
+          elems.push($$('.intro', {
+            html: doc.intro
+          }));
+        }
+
+        elems.push($$('.authors', {
+          html: doc.authors_string
+        }));
+
+        // console.log('FILTERS', filtersEl.childNodes);
+        if (filtersEl.childNodes.length > 0) {
+          elems.push(filtersEl);  
+        }
+
         var documentEl = $$('.document', {
           "data-id": doc.id,
-          children: [
-            $$('.published-on', {text: new Date(doc.published_on).toDateString() }),
-            $$('.title', {
-              children: [
-                $$('a', { href: doc.url, target: "_blank", html: doc.title })
-              ]
-            }),
-            $$('.authors', {
-              children: authors
-            }),
-            filtersEl
-          ]
+          children: elems
         });
 
-        // TODO: replace this with check doc.matches_count > 0
-        if (searchStr) {
-          var togglePreviewEl = $$('a.toggle-preview', {href: "#", html: '<i class="fa fa-eye"></i> Show matches for "'+searchStr+'"'});
-          documentEl.appendChild(togglePreviewEl);
+
+        // Render preview
+        // -----------
+
+        // var previewData = doc.fragments;
+        // var documentId = previewData.document.id;
+
+        if (doc.fragments) {
+          var previewEl = new PreviewView({
+            document: doc,
+            fragments: doc.fragments,
+            searchStr: searchStr
+          });
+
+          // Highlight previewed document in result list
+          documentEl.appendChild(previewEl.render().el);
         }
+
+        // // TODO: replace this with check doc.matches_count > 0
+        // if (searchStr) {
+        //   var togglePreviewEl = $$('a.toggle-preview', {href: "#", html: '<i class="fa fa-eye"></i> Show matches for "'+searchStr+'"'});
+        //   documentEl.appendChild(togglePreviewEl);
+        // }
 
         this.documentsEl.appendChild(documentEl);
       }, this);

@@ -53,7 +53,7 @@ FacetsView.Prototype = function() {
         var scopedFrequency = facetEntry.scoped_frequency;
         var percentage = (scopedFrequency*100)/frequency;
 
-        var facetValueEl = $$('a.value'+(facetEntry.selected ? '.selected' : '')+(facetEntry.scoped_frequency === 0 ? '.not-included' : ''), {
+        var facetValueEl = $$('a.value'+(facetEntry.selected ? '.selected' : '')+(scopedFrequency == 0 ? '.not-included' : ''), {
           href: "#",
           "data-facet": facet.property,
           "data-value": facetEntry.name,
