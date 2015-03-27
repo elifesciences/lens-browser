@@ -5,23 +5,23 @@ var AVAILABLE_FACETS = {
     "buckets": [
       {
         "key": "Research article",
-        "doc_count": 796
+        "doc_count": 838
       },
       {
         "key": "Insight",
-        "doc_count": 179
+        "doc_count": 186
       },
       {
         "key": "Correction",
-        "doc_count": 41
+        "doc_count": 44
       },
       {
         "key": "Feature article",
-        "doc_count": 32
+        "doc_count": 41
       },
       {
         "key": "Short report",
-        "doc_count": 27
+        "doc_count": 32
       },
       {
         "key": "Editorial",
@@ -29,11 +29,11 @@ var AVAILABLE_FACETS = {
       },
       {
         "key": "Research advance",
-        "doc_count": 10
+        "doc_count": 13
       },
       {
         "key": "Registered report",
-        "doc_count": 6
+        "doc_count": 8
       },
       {
         "key": "Feature Article",
@@ -47,59 +47,59 @@ var AVAILABLE_FACETS = {
     "buckets": [
       {
         "key": "Cell biology",
-        "doc_count": 275
+        "doc_count": 286
       },
       {
         "key": "Neuroscience",
-        "doc_count": 239
+        "doc_count": 251
       },
       {
         "key": "Biophysics and structural biology",
-        "doc_count": 208
+        "doc_count": 215
       },
       {
         "key": "Biochemistry",
-        "doc_count": 177
+        "doc_count": 183
       },
       {
         "key": "Developmental biology and stem cells",
-        "doc_count": 151
+        "doc_count": 162
       },
       {
         "key": "Genomics and evolutionary biology",
-        "doc_count": 138
+        "doc_count": 152
       },
       {
         "key": "Genes and chromosomes",
-        "doc_count": 120
+        "doc_count": 123
       },
       {
         "key": "Microbiology and infectious disease",
-        "doc_count": 106
+        "doc_count": 124
       },
       {
         "key": "Human biology and medicine",
-        "doc_count": 82
+        "doc_count": 88
       },
       {
         "key": "Immunology",
-        "doc_count": 58
+        "doc_count": 62
       },
       {
         "key": "Plant biology",
-        "doc_count": 48
+        "doc_count": 51
       },
       {
         "key": "Ecology",
-        "doc_count": 25
+        "doc_count": 33
       },
       {
         "key": "Epidemiology and global health",
-        "doc_count": 19
+        "doc_count": 21
       },
       {
         "key": "Computational and systems biology",
-        "doc_count": 1
+        "doc_count": 2
       }
     ]
   },
@@ -109,43 +109,43 @@ var AVAILABLE_FACETS = {
     "buckets": [
       {
         "key": "mouse",
-        "doc_count": 176
+        "doc_count": 195
       },
       {
         "key": "human",
-        "doc_count": 169
+        "doc_count": 182
       },
       {
         "key": "Mouse",
-        "doc_count": 127
+        "doc_count": 128
       },
       {
         "key": "Human",
-        "doc_count": 112
+        "doc_count": 114
       },
       {
         "key": "other",
-        "doc_count": 108
+        "doc_count": 116
       },
       {
         "key": "D. melanogaster",
-        "doc_count": 105
+        "doc_count": 113
       },
       {
         "key": "S. cerevisiae",
-        "doc_count": 91
+        "doc_count": 98
       },
       {
         "key": "E. coli",
-        "doc_count": 77
+        "doc_count": 81
       },
       {
         "key": "Other",
-        "doc_count": 49
+        "doc_count": 51
       },
       {
         "key": "Arabidopsis",
-        "doc_count": 37
+        "doc_count": 39
       }
     ]
   },
@@ -159,15 +159,15 @@ var AVAILABLE_FACETS = {
       },
       {
         "key": "Eve Marder",
-        "doc_count": 8
+        "doc_count": 9
       },
       {
         "key": "Detlef Weigel",
-        "doc_count": 7
+        "doc_count": 9
       },
       {
         "key": "Bill S Hansson",
-        "doc_count": 6
+        "doc_count": 7
       },
       {
         "key": "Chris P Ponting",
@@ -179,7 +179,7 @@ var AVAILABLE_FACETS = {
       },
       {
         "key": "Peter Walter",
-        "doc_count": 5
+        "doc_count": 6
       },
       {
         "key": "Alma L Burlingame",
