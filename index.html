@@ -24,7 +24,9 @@
         //
         // Injects itself into body
 
-        var app = new window.LensBrowser({});
+        var app = new window.LensBrowser({
+          api_url: "https://elife-lens-indexer.herokuapp.com"
+        });
         app.start();
 
         window.app = app;

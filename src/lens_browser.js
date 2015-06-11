@@ -4,9 +4,8 @@ var _ = require("underscore");
 var Application = require("substance-application");
 var BrowserController = require("./browser_controller");
 var DefaultRouter = require("substance-application").DefaultRouter;
-var config = require("../config");
 
-var LensBrowserApplication = function() {
+var LensBrowserApplication = function(config) {
   Application.call(this);
   this.controller = new BrowserController(this, config);
   var router = new DefaultRouter(this);

@@ -10,4 +10,6 @@ See [this article](https://medium.com/@_mql/self-host-a-scientific-journal-with-
 
 ## Installation
 
-Download the latest distribution [https://github.com/elifesciences/lens-browser/releases](here).
+1. Download the latest distribution [here](https://github.com/elifesciences/lens-browser/releases).
+2. Extract the contents
+3. Adjust index.html to point to the desired backend.
