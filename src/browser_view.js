@@ -6,7 +6,7 @@ var $$ = require("substance-application").$$;
 var SearchbarView = require("./searchbar_view");
 var PreviewView = require("./preview_view");
 var FacetsView = require("./facets_view");
-
+var util = require("./util");
 
 var ARTICLE_TYPES = {
   "Research article": "research-article",
@@ -211,13 +211,13 @@ BrowserView.Prototype = function() {
           });
         });
 
-
         var elems = [
           $$('.meta-info', {
             children: [
               $$('.article-type.'+ARTICLE_TYPES[doc.article_type], {html: doc.article_type+" "}),
               $$('.doi', {html: doc.doi+" "}),
-              $$('.published-on', {text: "published on "+ new Date(doc.published_on).toDateString()})
+
+              $$('.published-on', {text: "published on "+ util.formatDate(doc.published_on)})
             ]
           }),
           $$('.title', {
