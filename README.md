@@ -11,10 +11,12 @@ See [this article](https://medium.com/@_mql/self-host-a-scientific-journal-with-
 ## Installation
 
 1. Download the latest distribution [here](https://github.com/elifesciences/lens-browser/releases) and extract its contents
-2. Adjust index.html to point to the desired backend.
+2. Adjust index.html to point to your desired [Lens Indexer](https://github.com/elifesciences/lens-indexer) instance.
    
    ```js
      var app = new window.LensBrowser({
      api_url: "https://elife-lens-indexer.herokuapp.com"
      });
    ```
+   
+3. Upload the folder to a static webhost (Amazon S3 would do)
